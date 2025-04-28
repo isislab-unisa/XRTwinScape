@@ -1,0 +1,117 @@
+from django.db import models
+from django.contrib.auth import get_user_model
+from django.core.files.storage import default_storage
+import logging
+import dotenv
+from storages.backends.s3boto3 import S3Boto3Storage
+from django.utils.text import slugify
+import mimetypes
+from django.core.exceptions import ValidationError
+import os
+from django.core.files.base import ContentFile
+
+class MinioStorage(S3Boto3Storage):
+    bucket_name = 'lessons-media'
+    custom_domain = False
+
+dotenv.load_dotenv()
+
+logger = logging.getLogger(__name__)
+
+class Tag(models.Model):
+    name = models.CharField(max_length=64, null=False, blank=False, primary_key=True)
+    
+    class Meta:
+        db_table = "Tag"
+        verbose_name = "Tag"
+        verbose_name_plural = "Tag"
+        
+    def __str__(self):
+        return self.name
+
+class Status(models.TextChoices):
+    READY = "READY", "Ready"
+    FAILED = "FAILED", "Failed"
+    BUILDING = "BUILDING", "Building"
+    BUILDED = "BUILDED", "Builded"
+    RUNNING = "RUNNING", "Running"
+
+class Lesson(models.Model):
+    title = models.CharField(max_length=64)
+    description = models.TextField(null=True, blank=True)
+    creation_time = models.DateTimeField(auto_now_add=True)
+    images = models.ImageField(upload_to="", storage=MinioStorage(), null=True, blank=True)
+    video_file = models.FileField(upload_to="", storage=MinioStorage(), null=True, blank=True)
+    tag = models.ManyToManyField('Tag')
+    user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
+    status = models.CharField(
+        max_length=20,
+        choices=Status.choices,
+        default=Status.READY
+    )
+    ref_ply = models.CharField(max_length=64, null=True, blank=True)
+    ref_annotations = models.CharField(max_length=64, null=True, blank=True)
+    lesson_visibility = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "Lesson"
+        verbose_name = "Lesson"
+        verbose_name_plural = "Lesson"
+        permissions = [
+            ("can_create_lessons", "Can create lessons"),
+            ("can_view_lessons", "Can view lessons"),
+        ]
+
+    def __str__(self):
+        return self.title
+
+    def get_folder_name(self):
+        return f"{slugify(self.title)}_{self.pk}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        original_image = self.images
+        original_video = self.video_file
+
+        if original_video:
+            mime_type, _ = mimetypes.guess_type(original_video.name)
+            if not mime_type or not mime_type.startswith("video"):
+                raise ValidationError("Il file caricato non è un video valido.")
+        
+        if is_new:
+            super().save(*args, **kwargs)
+
+        folder_name = self.get_folder_name()
+
+        storage = MinioStorage()
+        keep_path = f"{folder_name}/.keep"
+        if not storage.exists(keep_path):
+            storage.save(keep_path, ContentFile(b""))
+
+        if original_image and '/' not in str(original_image):
+            with original_image.open('rb') as img_file:
+                image_content = img_file.read()
+                image_name = os.path.basename(original_image.name)
+                image_path = f"{folder_name}/{image_name}"
+                if storage.exists(image_name):
+                    storage.delete(image_name)
+                self.images.save(image_path, ContentFile(image_content), save=False)
+
+        if original_video and '/' not in str(original_video):
+            with original_video.open('rb') as vid_file:
+                video_content = vid_file.read()
+                video_name = os.path.basename(original_video.name)
+                video_path = f"{folder_name}/{video_name}"
+                if storage.exists(video_name):
+                    storage.delete(video_name)
+                self.video_file.save(video_path, ContentFile(video_content), save=False)
+
+        super().save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        folder_name = self.get_folder_name()
+        print(folder_name)
+        storage = MinioStorage()
+        if storage.exists(folder_name):
+            storage.delete(folder_name)
+        super().delete(*args, **kwargs)
