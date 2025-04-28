@@ -12,7 +12,7 @@ class LessonAdmin(ModelAdmin):
     # list_filter = ('status', 'user')
     search_fields = ['title', 'description']
     date_hierarchy = 'creation_time'
-    readonly_fields = ['user', 'status']
+    readonly_fields = ['user']
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
@@ -31,6 +31,11 @@ class LessonAdmin(ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.user = request.user
+        # if change and obj.status == "FAILED":
+        #     obj.status = "READY"
+            # initial = super().get_changeform_initial_data(request)
+            # initial['status'] = "READY"
+            
         obj.save()
         super().save_model(request, obj, form, change)
 
