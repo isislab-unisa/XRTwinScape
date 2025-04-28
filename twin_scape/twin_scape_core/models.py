@@ -109,9 +109,14 @@ class Lesson(models.Model):
         super().save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
-        folder_name = self.get_folder_name()
-        print(folder_name)
+        folder_name = self.get_folder_name() + "/"
         storage = MinioStorage()
-        if storage.exists(folder_name):
-            storage.delete(folder_name)
+        elements = storage.bucket.objects.filter(Prefix=folder_name)
+        try:
+            for k in elements:
+                k.delete()
+        except:
+            objects = list(storage.bucket.objects.all())
+            object_keys = [obj.key for obj in objects]
+            raise Exception(f"La cartella {folder_name} non esiste. Oggetti presenti: {object_keys}")
         super().delete(*args, **kwargs)
