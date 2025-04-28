@@ -1,0 +1,6 @@
+.env
+/twin_scape/db.sqlite3
+migrations/
+__pycache__/
+images/
+videos/
