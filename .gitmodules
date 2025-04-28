@@ -1,0 +1,4 @@
+[submodule "mast3r-nerfstudio-pipe/mast3r_sfm"]
+	path = mast3r-nerfstudio-pipe/mast3r_sfm
+	url = https://github.com/naver/mast3r.git
+	branch = mast3r_sfm
