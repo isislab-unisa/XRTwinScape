@@ -27,11 +27,6 @@ RUN apt-get update && \
 RUN git clone https://github.com/nerfstudio-project/nerfstudio.git /tmp/nerfstudio
 # RUN git clone --recursive https://github.com/AndreaAmorosini/full_pipe_mast3r_nerfstudio.git /opt/full_pipe_mast3r_nerfstudio
 RUN git clone --recursive https://github.com/isislab-unisa/XRTwinScape.git /opt/XRTwinScape
-#COPY THE FOLDER full_pipe_mast3r_nerfstudio TO /opt/full_pipe_mast3r_nerfstudio
-COPY /opt/XRTwinScape/mast3r-nerfstudio-pipe  /opt/full_pipe_mast3r_nerfstudio
-#DELETE XRTwinScape FOLDER
-RUN rm -rf /opt/XRTwinScape
-
 
 # ------------------------------------------------------------------------
 # 2. Install a newer CMake
@@ -110,7 +105,7 @@ RUN conda run -n mast3r_env git clone --branch mast3r_sfm --recursive https://gi
 
 # b) Install main Python dependencies from the repo inside the conda environment
 WORKDIR /opt/mast3r
-RUN conda install pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
+RUN conda install -y pytorch torchvision pytorch-cuda=11.8 -c pytorch -c nvidia
 RUN conda run -n mast3r_env pip install --no-cache-dir -r requirements.txt
 # If you need optional packages, uncomment or adapt the following line:
 RUN conda run -n mast3r_env pip install --no-cache-dir -r dust3r/requirements.txt && \
@@ -181,7 +176,8 @@ COPY --from=builder /build/colmap/ /usr/local/
 COPY --from=builder /build/glomap/ /usr/local/
 COPY --from=builder /usr/local/lib/python3.10/dist-packages/ /usr/local/lib/python3.10/dist-packages/
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
-COPY --from=builder /opt/full_pipe_mast3r_nerfstudio/ /full_pipe_mast3r_nerfstudio
+COPY --from=builder /opt/XRTwinScape/mast3r-nerfstudio-pipe /full_pipe_mast3r_nerfstudio
+
 
 # Copy the Miniconda installation (and thus the mast3r_env) into the runtime stage.
 COPY --from=builder /opt/miniconda /opt/miniconda
