@@ -12,6 +12,9 @@ def call_api_and_save(self, lesson_id, training_type):
     storage = MinioStorage()
     response = None
     try:
+        if Lesson.objects.filter(status=Status.BUILDING).exists():
+            raise Exception("C'è già una lezione in fase di build. Riprovo...")
+        
         lesson = Lesson.objects.get(pk=lesson_id)
         payload = {
             "lesson_name" : lesson.title,
@@ -50,7 +53,7 @@ def call_api_and_save(self, lesson_id, training_type):
             lesson.save()
             send_mail(
                 'Build Fallita',
-                f"Lezione: {lesson.title} fallita.",
+                f"Lezione: {lesson.title} fallita. Errore interno del server",
                 os.environ.get('EMAIL_HOST_USER'),
                 [lesson.user.email],
                 fail_silently=False,
@@ -69,18 +72,28 @@ def call_api_and_save(self, lesson_id, training_type):
             )
             return f"Build failed for lesson {lesson_id}"
         else:
-            return f"Build failed for lesson {lesson_id}"
-    
-    except Exception as e:
-        if response is not None and response.status_code != 200:
             status = Status.FAILED
-            lesson.Status = status
+            lesson.status = status
             lesson.save()
             send_mail(
                 'Build Fallita',
-                f"Lezione: {lesson.title} fallita.",
-                "demaio.dario95@gmail.com",
+                f"Lezione: {lesson.title} fallita. Errore interno del server",
+                os.environ.get('EMAIL_HOST_USER'),
                 [lesson.user.email],
                 fail_silently=False,
             )
-        return str(e)
+            return f"Build failed for lesson {lesson_id}"    
+    except Exception as e:
+        raise self.retry(exc=e, countdown=5000)
+        # if response is not None and response.status_code != 200:
+        #     status = Status.FAILED
+        #     lesson.Status = status
+        #     lesson.save()
+        #     send_mail(
+        #         'Build Fallita',
+        #         f"Lezione: {lesson.title} fallita.",
+        #         "demaio.dario95@gmail.com",
+        #         [lesson.user.email],
+        #         fail_silently=False,
+        #     )
+        # return str(e)
