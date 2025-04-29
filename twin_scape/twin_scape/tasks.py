@@ -3,6 +3,7 @@ from celery import shared_task
 from twin_scape_core.models import Lesson, MinioStorage, Status
 from django.core.mail import send_mail
 import os
+import json
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -13,17 +14,23 @@ def call_api_and_save(self, lesson_id, training_type):
     try:
         lesson = Lesson.objects.get(pk=lesson_id)
         payload = {
-            'lesson_title': lesson.title,
-            'lesson_id': lesson.id,
-            'video_url': lesson.video_file,
+            "lesson_name" : lesson.title,
+            'lesson_id': str(lesson.id),
+            'video_url': lesson.video_file.name,
             'training_type': training_type
         }
-        
+                
         url = f"http://full_gaussian_pipe:8090/extract_ply"
         
-        response = requests.post(url, data=payload)
+        # print("Launching full pipeline")
+        # print(f"Payload: {payload}")
+        
+        headers = {"Content-type": "application/json"}
+        response = requests.post(url, headers=headers, json=payload)
         # response = requests.Response()
         # response.status_code = 200
+        
+        # print("Response:", response.status_code, response.text)
         
         if response.status_code == 200:
             status = Status.BUILDING
