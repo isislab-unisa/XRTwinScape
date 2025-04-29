@@ -6,12 +6,18 @@ from .models import MinioStorage
 from django.http import JsonResponse
 import base64
 from django.http import FileResponse
-from .models import Lesson
+from .models import Lesson, Status
 from django.shortcuts import redirect
 from twin_scape.tasks import call_api_and_save
 from django.core.mail import send_mail
 from django.views.decorators.csrf import csrf_exempt
 import os
+import redis
+from redis.lock import Lock
+
+# Redis client
+redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+build_lock = Lock(redis_client, "build_lock")
 
 @login_required
 @require_http_methods(['GET'])
@@ -70,8 +76,10 @@ def build(request):
     lesson_id = request.POST.get('lesson_id')
     lesson = Lesson.objects.get(pk=lesson_id)
     value = request.POST.get('training_type')
-    call_api_and_save.apply_async(args=[lesson.id, value], queue='api_tasks')
-    
+    if lesson.status == "READY":
+        lesson.status = Status.ENQUEUED
+        lesson.save()
+        call_api_and_save.apply_async(args=[lesson.id, value], queue='api_tasks')
     return redirect('/admin/')
 
 @require_http_methods(['POST'])
@@ -81,36 +89,29 @@ def complete_build(request):
         lesson_id = request.POST.get('lesson_id')
         ply_path = request.POST.get('ply_path')
         
-        print(f"[DEBUG] Status: {status}")
-        print(f"[DEBUG] Lesson ID: {lesson_id}")
-        print(f"[DEBUG] PLY Path: {ply_path}")
-        
+        lesson = Lesson.objects.get(pk=lesson_id)
+
         if status == "COMPLETED":
-            lesson = Lesson.objects.get(pk=lesson_id)
             lesson.ref_ply = ply_path
             lesson.status = "BUILDED"
-            lesson.save()
-            
-            send_mail(
-                'Build in corso',
-                f"Lezione {lesson.title} in fase di build.",
-                os.environ.get('EMAIL_HOST_USER'),
-                [lesson.user.email],
-                fail_silently=False,
-            )
         else:
-            lesson = Lesson.objects.get(pk=lesson_id)
             lesson.status = "FAILED"
-            lesson.save()
-            
-            send_mail(
-                'Build in corso',
-                f"Lezione {lesson.title} in fase di build.",
-                os.environ.get('EMAIL_HOST_USER'),
-                [lesson.user.email],
-                fail_silently=False,
-            )
+
+        lesson.save()
+
+        send_mail(
+            'Build status aggiornato',
+            f"Lezione {lesson.title} ha ora stato {lesson.status}.",
+            os.environ.get('EMAIL_HOST_USER'),
+            [lesson.user.email],
+            fail_silently=False,
+        )
+
+        if build_lock.locked():
+            build_lock.release()
+
         return JsonResponse({"status": "success"}, status=200)
+
     except Exception as e:
         print(f"[ERROR] Exception in complete_build: {str(e)}")
-        return JsonResponse({"error": "An error occurred"}, status=500)    
+        return JsonResponse({"error": "An error occurred"}, status=500)
