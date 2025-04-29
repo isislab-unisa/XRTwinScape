@@ -109,6 +109,7 @@
                             <th class="px-4 py-2 text-left">Stato</th>
                             <th class="px-4 py-2 text-left md:table-cell mobile-hidden">Immagini</th>
                             <th class="px-4 py-2 text-left">Azioni</th>
+                            <th class="px-4 py-2 text-left">User</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -184,6 +185,13 @@
                                                 </div>
                                             {% endif %}
                                         </div>
+                                    </td>
+                                    <td data-label="aaaa" class="px-4 py-2 border-b md:table-cell mobile-hidden">
+                                        {% if lesson.user %}
+                                            <img src="{{ lesson.user }}" alt="{{ lesson.user }}" class="w-16 h-16 object-cover rounded">
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% endif %}

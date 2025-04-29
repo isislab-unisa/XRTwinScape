@@ -35,6 +35,7 @@ class Status(models.TextChoices):
     BUILDING = "BUILDING", "Building"
     BUILDED = "BUILDED", "Builded"
     RUNNING = "RUNNING", "Running"
+    ENQUEUED = "ENQUEUED", "Enqueued"
 
 class Lesson(models.Model):
     title = models.CharField(max_length=64)
@@ -52,6 +53,7 @@ class Lesson(models.Model):
     ref_ply = models.CharField(max_length=64, null=True, blank=True)
     ref_annotations = models.CharField(max_length=64, null=True, blank=True)
     lesson_visibility = models.BooleanField(default=True)
+    build_started_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         db_table = "Lesson"

@@ -13,3 +13,5 @@ redis
 requests
 certifi
 pip-system-certs
+django-redis
+django-celery-beat
