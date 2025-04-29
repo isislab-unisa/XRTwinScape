@@ -95,7 +95,7 @@ services:
       "
     
   full_gaussian_pipe:
-    image: nerfstudio-mast3r:prod
+    image: atermoros/nerfstudio-mast3r:latest
     container_name: full_gaussian_pipe
     gpus: all
     user: root
