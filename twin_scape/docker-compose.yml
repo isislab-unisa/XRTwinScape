@@ -95,13 +95,13 @@ services:
       "
     
   full_gaussian_pipe:
-    image: atermoros/nerfstudio-mast3r:latest
+    image: nerfstudio-mast3r:prod
     container_name: full_gaussian_pipe
     gpus: all
     user: root
     shm_size: "48g"	
     ports:
-      - "8090:8000"
+      - "8090:8090"
     volumes:
       - ./full_gaussian_pipe:/workspace
 
