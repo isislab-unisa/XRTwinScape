@@ -19,7 +19,7 @@ MINIO_EDNPOINT = "http://minio:9000"
 MINIO_ROOT_USER = "minioadmin"
 MINIO_ROOT_PASSWORD = "minioadmin123"
 AWS_STORAGE_BUCKET_NAME = "lessons-media"
-CALLBACK_ENDPOINT = "http://web:8000/complete_build"
+CALLBACK_ENDPOINT = "http://web:80/complete_build"
 
 class CustomHTTPException(HTTPException):
     def __init__(self, status_code: int, detail: str, error_code: int):
