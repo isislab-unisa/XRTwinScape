@@ -37,6 +37,12 @@ class Status(models.TextChoices):
     RUNNING = "RUNNING", "Running"
     ENQUEUED = "ENQUEUED", "Enqueued"
 
+class LessonQuerySet(models.QuerySet):
+    def delete(self, *args, **kwargs):
+        for obj in self:
+            obj.delete()  # chiama il metodo custom delete
+        super().delete(*args, **kwargs)
+
 class Lesson(models.Model):
     title = models.CharField(max_length=64)
     description = models.TextField(null=True, blank=True)
@@ -54,6 +60,7 @@ class Lesson(models.Model):
     ref_annotations = models.CharField(max_length=64, null=True, blank=True)
     lesson_visibility = models.BooleanField(default=True)
     build_started_at = models.DateTimeField(null=True, blank=True)
+    objects = LessonQuerySet.as_manager()
 
     class Meta:
         db_table = "Lesson"

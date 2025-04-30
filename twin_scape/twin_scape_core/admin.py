@@ -28,9 +28,6 @@ class LessonAdmin(ModelAdmin):
         return ", ".join(tag.name for tag in obj.tag.all())
     get_tags.short_description = 'Tags'
     
-    # class Media:
-    #     js = ('/static/viewer/file.js',)
-    
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
@@ -48,10 +45,10 @@ class LessonAdmin(ModelAdmin):
     def save_model(self, request, obj, form, change):
         if not change:
             obj.user = request.user
-        # if change and obj.status == "FAILED":
-        #     obj.status = "READY"
-            # initial = super().get_changeform_initial_data(request)
-            # initial['status'] = "READY"
+        if change and obj.status == "FAILED":
+            obj.status = "READY"
+            initial = super().get_changeform_initial_data(request)
+            initial['status'] = "READY"
             
         obj.save()
         super().save_model(request, obj, form, change)
