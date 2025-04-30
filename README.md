@@ -5,7 +5,6 @@ This project uses the AI based technology of Gaussian Splatting to recreate an e
 The full Gaussian Splatting pipeline developed consists of [Mast3r](https://github.com/naver/mast3r/tree/mast3r_sfm) for the SfM part and [Nerfstudio](https://github.com/nerfstudio-project/nerfstudio) for the reconstruction training.
 
 The application provides both an editor for modifying and annotating the reconstruction, and a VR and web-based viewer for reconstructions exploration.
-Both are based on the [PlayCanvas Editor](https://github.com/playcanvas).
 
 ## XR2Learn
 This XRTwinScape project has been funded through the XR2Learn [Open Call 2](https://xr2learn.eu/open-call-2-winners/).
