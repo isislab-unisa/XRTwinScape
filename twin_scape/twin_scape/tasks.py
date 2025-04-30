@@ -20,7 +20,7 @@ redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://redis:
 def call_api_and_save(self, lesson_id, training_type):
     storage = MinioStorage()
     response = None
-    lock = Lock(redis_client, "build_lock", timeout=6 * 60 * 60)
+    lock = Lock(redis_client, "build_lock", timeout=24 * 60 * 60)
 
     try:
         lesson = Lesson.objects.get(pk=lesson_id)
@@ -28,7 +28,7 @@ def call_api_and_save(self, lesson_id, training_type):
 
         print("Tentativo di acquisizione lock...")
         try:
-            acquired = lock.acquire(blocking=True, blocking_timeout=24 * 60 * 60)
+            acquired = lock.acquire(blocking=True, blocking_timeout=1 * 60 * 60)
             print(f"Acquired: {acquired}")
             if not acquired:
                 print(f"Could not acquire lock for lesson {lesson_id}, retrying...")
@@ -49,6 +49,9 @@ def call_api_and_save(self, lesson_id, training_type):
             url = f"http://full_gaussian_pipe:8090/extract_ply"
             headers = {"Content-type": "application/json"}
             response = requests.post(url, headers=headers, json=payload)
+            
+            print("Response status code:", response.status_code)
+            print(response)
             
             # Simulazione della build
             # print("Simulazione build in corso...")
@@ -80,6 +83,9 @@ def call_api_and_save(self, lesson_id, training_type):
                     [lesson.user.email],
                     fail_silently=False,
                 )
+                if lock.locked():
+                    print("Rilascio il lock...")
+                    lock.release()
                 return f"Build failed for lesson {lesson_id}"  
 
         finally:
@@ -108,26 +114,40 @@ def call_api_and_save(self, lesson_id, training_type):
 
 @shared_task(queue='api_tasks')
 def fail_stuck_builds():
-    redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
-    build_lock = Lock(redis_client, "build_lock")
-    
-    timeout_minutes = 24 * 60 # 6 hours
-    threshold = timezone.now() - timedelta(minutes=timeout_minutes)
+    try:
+        redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+        build_lock = Lock(redis_client, "build_lock")
+    except Exception as e:
+        print(f"Errore nell'acquisizione del lock: {e}")
+            
+    lesson = None
+    try:
+        timeout_minutes = 24 * 60 # 24 hours
+        threshold = timezone.now() - timedelta(minutes=timeout_minutes)
 
-    lesson = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold).first()
-
+        lesson = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold).first()
+    except Lesson.DoesNotExist:
+        print("Lesson does not exist")
+    except Exception as e:
+        print(f"Errore: {e}")
+        
     if lesson is None:
         return
+    try:
+        lesson.status = Status.FAILED
+        lesson.save()
+        send_mail(
+            'Build Fallita',
+            f"Lezione: {lesson.title} è fallita automaticamente per superamento del tempo massimo di build.",
+            os.environ.get('EMAIL_HOST_USER'),
+            [lesson.user.email],
+            fail_silently=False,
+        )
+    except Exception as e:
+        print(f"Errore nell'acquisizione del lock: {e}")
     
-    lesson.status = Status.FAILED
-    lesson.save()
-    send_mail(
-        'Build Fallita',
-        f"Lezione: {lesson.title} è fallita automaticamente per superamento del tempo massimo di build.",
-        os.environ.get('EMAIL_HOST_USER'),
-        [lesson.user.email],
-        fail_silently=False,
-    )
-    
-    if build_lock.locked():
-        build_lock.release()
+    try:
+        if build_lock.locked():
+            build_lock.release()
+    except Exception as e:
+        print(f"Errore nell'acquisizione del lock: {e}")
