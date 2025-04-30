@@ -93,7 +93,7 @@ def complete_build(request):
 
         if status == "COMPLETED":
             lesson.ref_ply = ply_path
-            lesson.status = "BUILDED"
+            lesson.status = "BUILT"
         else:
             lesson.status = "FAILED"
 

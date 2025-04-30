@@ -235,25 +235,25 @@ UNFOLD = {
                     },
                 ],
             },
+            # {
+            #     "title": _("Users & Groups"),
+            #     "separator": False,
+            #     "collapsible": True,
+            #     "items": [
+            #         {
+            #             "title": _("Users"),
+            #             "icon": "person",
+            #             "link": reverse_lazy("admin:auth_user_changelist"),
+            #         },
+            #         {
+            #             "title": _("Groups"),
+            #             "icon": "group",
+            #             "link": reverse_lazy("admin:auth_group_changelist"),
+            #         },
+            #     ],
+            # },
             {
-                "title": _("Users & Groups"),
-                "separator": False,
-                "collapsible": True,
-                "items": [
-                    {
-                        "title": _("Users"),
-                        "icon": "person",
-                        "link": reverse_lazy("admin:auth_user_changelist"),
-                    },
-                    {
-                        "title": _("Groups"),
-                        "icon": "group",
-                        "link": reverse_lazy("admin:auth_group_changelist"),
-                    },
-                ],
-            },
-            {
-                "title": _("Twin Scape Core"),
+                "title": _("Twin Scape Functionalities"),
                 "separator": False,
                 "collapsible": True,
                 "items": [

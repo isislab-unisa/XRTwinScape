@@ -33,7 +33,7 @@ class Status(models.TextChoices):
     READY = "READY", "Ready"
     FAILED = "FAILED", "Failed"
     BUILDING = "BUILDING", "Building"
-    BUILDED = "BUILDED", "Builded"
+    BUILT = "BUILT", "Built"
     RUNNING = "RUNNING", "Running"
     ENQUEUED = "ENQUEUED", "Enqueued"
 

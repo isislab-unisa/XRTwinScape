@@ -8,18 +8,25 @@ class TagAdmin(ModelAdmin):
 admin.site.register(Tag, TagAdmin)
 
 class LessonAdmin(ModelAdmin):
-    list_display = ['title', 'description', 'creation_time', 'ref_ply', 'ref_annotations', 'lesson_visibility', 'user', 'status']
+    list_display = ['title', 'description', 'creation_time', 'ref_ply', 'ref_annotations', 'lesson_visibility', 'user', 'status', 'get_tags']
     # list_filter = ('status', 'user')
     search_fields = ['title', 'description']
     date_hierarchy = 'creation_time'
-    readonly_fields = ['user']
+    readonly_fields = ['user', 'status']
 
+    def get_tags(self, obj):
+        return ", ".join(tag.name for tag in obj.tag.all())
+    get_tags.short_description = 'Tags'
+    
+    # class Media:
+    #     js = ('/static/viewer/file.js',)
+    
     def get_queryset(self, request):
         qs = super().get_queryset(request)
-        return qs.filter(Q(user=request.user) | Q(status='BUILDED'))
+        return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'user', 'status']
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag'] # 'user', 'status',
         return fields
 
     def get_readonly_fields(self, request, obj=None):
@@ -45,27 +52,27 @@ class LessonAdmin(ModelAdmin):
             initial['user'] = request.user.pk
         return initial
     
-    # def has_change_permission(self, request, obj=None):
-    #     has_permission = super().has_change_permission(request, obj)
-    #     if not has_permission:
-    #         return False
-    #     if obj is None:
-    #         return True
-    #     if obj.status in ['BUILDED', 'BUILDING', 'RUNNING']:
-    #         return False
-    #     return True
+    def has_change_permission(self, request, obj=None):
+        has_permission = super().has_change_permission(request, obj)
+        if not has_permission:
+            return False
+        if obj is None:
+            return True
+        if obj.status in ['BUILT', 'BUILDING', 'RUNNING']:
+            return False
+        return True
     
-    # def has_delete_permission(self, request, obj=None):
-    #     has_permission = super().has_delete_permission(request, obj)
-    #     if not has_permission:
-    #         return False
-    #     if obj is None:
-    #         return True
-    #     if obj.status in ['RUNNING', 'BUILDING']:
-    #         return False
+    def has_delete_permission(self, request, obj=None):
+        has_permission = super().has_delete_permission(request, obj)
+        if not has_permission:
+            return False
+        if obj is None:
+            return True
+        if obj.status in ['RUNNING', 'BUILDING']:
+            return False
         
-    #     if obj.user != request.user:
-    #         return False
-    #     return True
+        if obj.user != request.user:
+            return False
+        return True
     
 admin.site.register(Lesson, LessonAdmin)
