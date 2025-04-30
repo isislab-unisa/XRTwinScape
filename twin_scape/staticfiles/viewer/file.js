@@ -1,36 +1,41 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const videoInput = document.querySelector('input[name="video_file"]');
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestisce sia i form normali che quelli in Unfold
+    document.addEventListener('submit', function(event) {
+        const form = event.target;
+        if (!form.matches('form')) return;
 
-    if (videoInput) {
-        const spinner = document.createElement('div');
-        spinner.classList.add('spinner');
-        spinner.style.display = 'none';
-        spinner.style.position = 'fixed';
-        spinner.style.top = '50%';
-        spinner.style.left = '50%';
-        spinner.style.transform = 'translate(-50%, -50%)';
-        spinner.style.border = '16px solid #f3f3f3';
-        spinner.style.borderTop = '16px solid #3498db';
-        spinner.style.borderRadius = '50%';
-        spinner.style.width = '60px';
-        spinner.style.height = '60px';
-        spinner.style.zIndex = '9999';
-        spinner.style.animation = 'spin 2s linear infinite';
-        document.body.appendChild(spinner);
+        console.log("Form inviato - loader attivato");
 
-        const style = document.createElement('style');
-        style.innerHTML = `
-            @keyframes spin {
-                0% { transform: rotate(0deg); }
-                100% { transform: rotate(360deg); }
-            }
+        // Crea il loader
+        const loader = document.createElement('div');
+        loader.className = 'fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm';
+        loader.innerHTML = `
+            <div class="flex flex-col items-center">
+                <div class="relative w-16 h-16">
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center">
+                        <div class="w-8 h-8 border-4 border-white border-b-transparent rounded-full animate-spin-reverse"></div>
+                    </div>
+                </div>
+                <p class="mt-4 text-white font-medium">Processing...</p>
+            </div>
         `;
-        document.head.appendChild(style);
 
-        videoInput.addEventListener('change', function () {
-            if (videoInput.files.length > 0) {
-                spinner.style.display = 'block';
-            }
+        // Aggiungi il loader al body
+        document.body.appendChild(loader);
+
+        // Disabilita il pulsante di submit
+        const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+
+        // Rimuovi il loader quando la pagina cambia (fallback)
+        window.addEventListener('beforeunload', function() {
+            loader.remove();
         });
-    }
+    });
 });

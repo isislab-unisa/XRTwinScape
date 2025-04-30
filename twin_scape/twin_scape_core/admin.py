@@ -2,18 +2,28 @@ from django.contrib import admin
 from .models import Lesson, Tag
 from unfold.admin import ModelAdmin
 from django.db.models import Q
+from django.utils.safestring import mark_safe
 
 class TagAdmin(ModelAdmin):
     pass
 admin.site.register(Tag, TagAdmin)
 
+from django import forms
+from django.db import models
+
 class LessonAdmin(ModelAdmin):
-    list_display = ['title', 'description', 'creation_time', 'ref_ply', 'ref_annotations', 'lesson_visibility', 'user', 'status', 'get_tags']
+    list_display = ['title', 'description', 'creation_time', 'lesson_visibility', 'user', 'status', 'get_tags']
     # list_filter = ('status', 'user')
     search_fields = ['title', 'description']
     date_hierarchy = 'creation_time'
     readonly_fields = ['user', 'status']
 
+    class Media:
+        
+        js = (
+            'viewer/file.js',
+        )
+    
     def get_tags(self, obj):
         return ", ".join(tag.name for tag in obj.tag.all())
     get_tags.short_description = 'Tags'
@@ -26,7 +36,7 @@ class LessonAdmin(ModelAdmin):
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag'] # 'user', 'status',
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status'] # 'user', status 
         return fields
 
     def get_readonly_fields(self, request, obj=None):
@@ -74,5 +84,5 @@ class LessonAdmin(ModelAdmin):
         if obj.user != request.user:
             return False
         return True
-    
+
 admin.site.register(Lesson, LessonAdmin)

@@ -1,6 +1,6 @@
 {% extends 'unfold/layouts/base.html' %}
 {% load i18n unfold %}
-{% comment %} {% load replace %} {% endcomment %}
+{% load replace %}
 
 {% block breadcrumbs %}{% endblock %}
 
@@ -103,14 +103,14 @@
                 <table class="min-w-full responsive-table">
                     <thead class="bg-gray-100 dark:bg-gray-800">
                         <tr>
-                            <th class="px-4 py-2 text-left">Titolo</th>
-                            <th class="px-4 py-2 text-left md:table-cell mobile-hidden">Descrizione</th>
-                            <th class="px-4 py-2 text-left lg:table-cell mobile-hidden">Data di Creazione</th>
+                            <th class="px-4 py-2 text-left">Title</th>
+                            <th class="px-4 py-2 text-left md:table-cell mobile-hidden">Description</th>
+                            <th class="px-4 py-2 text-left lg:table-cell mobile-hidden">Creation Date</th>
                             <th class="px-4 py-2 text-left">User</th>
-                            <th class="px-4 py-2 text-left lg:table-cell mobile-hidden">Tag</th>
-                            <th class="px-4 py-2 text-left">Stato</th>
-                            <th class="px-4 py-2 text-left md:table-cell mobile-hidden">Immagini</th>
-                            <th class="px-4 py-2 text-left">Azioni</th>
+                            <th class="px-4 py-2 text-left lg:table-cell mobile-hidden">Tags</th>
+                            <th class="px-4 py-2 text-left">Status</th>
+                            <th class="px-4 py-2 text-left md:table-cell mobile-hidden">Images</th>
+                            <th class="px-4 py-2 text-left">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -128,11 +128,7 @@
                                     </td>
 
                                     <td data-label="creator" class="px-4 py-2 border-b lg:table-cell mobile-hidden">
-                                        {% if lesson.user %}
-                                            {{lessons.user}}
-                                        {% else %}
-                                            N/A
-                                        {% endif %}
+                                            {{lesson.user}}
                                     </td>
                                     
                                     <td data-label="Tag" class="px-4 py-2 border-b lg:table-cell mobile-hidden">
@@ -149,7 +145,7 @@
                                     
                                     <td data-label="Immagine" class="px-4 py-2 border-b md:table-cell mobile-hidden">
                                         {% if lesson.images %}
-                                            <img src="{{ lesson.images.url }}" alt="{{ lesson.title }}" class="w-16 h-16 object-cover rounded">
+                                            <img src="{{ lesson.images.url|replace:"minio" }}" alt="{{ lesson.images.url|replace:"minio" }}" class="w-16 h-16 object-cover rounded">
                                         {% else %}
                                             N/A
                                         {% endif %}
