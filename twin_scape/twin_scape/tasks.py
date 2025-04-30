@@ -116,6 +116,9 @@ def fail_stuck_builds():
 
     lesson = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold).first()
 
+    if lesson is None:
+        return
+    
     lesson.status = Status.FAILED
     lesson.save()
     send_mail(
