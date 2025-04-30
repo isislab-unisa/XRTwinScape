@@ -108,18 +108,23 @@ def call_api_and_save(self, lesson_id, training_type):
 
 @shared_task(queue='api_tasks')
 def fail_stuck_builds():
+    redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
+    build_lock = Lock(redis_client, "build_lock")
+    
     timeout_minutes = 6 * 60 # 6 hours
     threshold = timezone.now() - timedelta(minutes=timeout_minutes)
 
-    stuck_lessons = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold)
+    lesson = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold).first()
 
-    for lesson in stuck_lessons:
-        lesson.status = Status.FAILED
-        lesson.save()
-        send_mail(
-            'Build Fallita',
-            f"Lezione: {lesson.title} è fallita automaticamente per superamento del tempo massimo di build.",
-            os.environ.get('EMAIL_HOST_USER'),
-            [lesson.user.email],
-            fail_silently=False,
-        )
+    lesson.status = Status.FAILED
+    lesson.save()
+    send_mail(
+        'Build Fallita',
+        f"Lezione: {lesson.title} è fallita automaticamente per superamento del tempo massimo di build.",
+        os.environ.get('EMAIL_HOST_USER'),
+        [lesson.user.email],
+        fail_silently=False,
+    )
+    
+    if build_lock.locked():
+        build_lock.release()
