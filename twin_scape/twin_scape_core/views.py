@@ -115,3 +115,17 @@ def complete_build(request):
     except Exception as e:
         print(f"[ERROR] Exception in complete_build: {str(e)}")
         return JsonResponse({"error": "An error occurred"}, status=500)
+
+@login_required
+@require_http_methods(['POST'])
+def get_images(request, id):
+    minio_storage = MinioStorage()
+    try:
+        lesson = Lesson.objects.get(pk=id)
+        file = minio_storage.open(lesson.images, mode='rb')
+        response = FileResponse(file, as_attachment=True, filename="file_name")
+        response['Content-Type'] = 'application/octet-stream'
+        return response
+    except Exception as e:
+        print(f"[ERROR] Exception in get_images: {str(e)}")
+        return JsonResponse({"error": "An error occurred"}, status=500)
