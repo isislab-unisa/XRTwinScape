@@ -19,7 +19,7 @@ app.conf.task_queues = {
 }
 
 app.conf.beat_schedule = {
-    'fail-stuck-builds-every-10-minutes': {
+    'fail-stuck-builds': {
         'task': 'twin_scape.tasks.fail_stuck_builds',
         'schedule': timedelta(minutes=10),
     },
