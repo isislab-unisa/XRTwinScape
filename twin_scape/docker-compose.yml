@@ -95,16 +95,16 @@ services:
       /usr/bin/mc policy set none myminio/lessons-media;
       "
     
-  # full_gaussian_pipe:
-  #   image: atermoros/nerfstudio-mast3r:latest
-  #   container_name: full_gaussian_pipe
-  #   gpus: all
-  #   user: root
-  #   shm_size: "48g"	
-  #   ports:
-  #     - "8090:8090"
-  #   volumes:
-  #     - ./full_gaussian_pipe:/workspace
+  full_gaussian_pipe:
+    image: atermoros/nerfstudio-mast3r:latest
+    container_name: full_gaussian_pipe
+    gpus: all
+    user: root
+    shm_size: "48g"	
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./full_gaussian_pipe:/workspace
 
 volumes:
   mysql_data_twin_scape:
