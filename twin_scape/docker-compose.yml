@@ -89,22 +89,25 @@ services:
     env_file:
       - .env
     entrypoint: >
-      /bin/sh -c "
-      /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD};
-      /usr/bin/mc mb --quiet myminio/lessons-media;
-      /usr/bin/mc policy set none myminio/lessons-media;
-      "
+      /bin/sh -c '
+      until /usr/bin/mc config host add myminio http://minio:9000 ${MINIO_ROOT_USER} ${MINIO_ROOT_PASSWORD}; do
+        echo "Waiting for MinIO to be ready...";
+        sleep 3;
+      done;
+      /usr/bin/mc mb --quiet myminio/lessons-media || true;
+      /usr/bin/mc policy set none myminio/lessons-media || true;
+      '
     
-  full_gaussian_pipe:
-    image: atermoros/nerfstudio-mast3r:latest
-    container_name: full_gaussian_pipe
-    gpus: all
-    user: root
-    shm_size: "48g"	
-    ports:
-      - "8090:8090"
-    volumes:
-      - ./full_gaussian_pipe:/workspace
+  # full_gaussian_pipe:
+  #   image: atermoros/nerfstudio-mast3r:latest
+  #   container_name: full_gaussian_pipe
+  #   gpus: all
+  #   user: root
+  #   shm_size: "48g"	
+  #   ports:
+  #     - "8090:8090"
+  #   volumes:
+  #     - ./full_gaussian_pipe:/workspace
 
 volumes:
   mysql_data_twin_scape:
