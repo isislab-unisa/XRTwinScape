@@ -116,16 +116,30 @@ def complete_build(request):
         print(f"[ERROR] Exception in complete_build: {str(e)}")
         return JsonResponse({"error": "An error occurred"}, status=500)
 
+import mimetypes
+
 @login_required
-@require_http_methods(['POST'])
+@require_http_methods(['GET'])
 def get_images(request, id):
-    minio_storage = MinioStorage()
     try:
         lesson = Lesson.objects.get(pk=id)
-        file = minio_storage.open(lesson.images, mode='rb')
-        response = FileResponse(file, as_attachment=True, filename="file_name")
-        response['Content-Type'] = 'application/octet-stream'
+        if not lesson.images:
+            return JsonResponse({"error": "Nessuna immagine disponibile per questa lezione."}, status=404)
+
+        minio_storage = MinioStorage()
+
+        image_file = minio_storage.open(lesson.images.name, mode='rb')
+
+        mime_type, _ = mimetypes.guess_type(lesson.images.name)
+        content_type = mime_type or 'application/octet-stream'
+
+        response = FileResponse(image_file, as_attachment=False)
+        response['Content-Type'] = content_type
+
         return response
+
+    except Lesson.DoesNotExist:
+        return JsonResponse({"error": "Lezione non trovata."}, status=404)
     except Exception as e:
         print(f"[ERROR] Exception in get_images: {str(e)}")
-        return JsonResponse({"error": "An error occurred"}, status=500)
+        return JsonResponse({"error": "Errore durante il recupero dell'immagine."}, status=500)

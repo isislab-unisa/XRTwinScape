@@ -1,6 +1,5 @@
 {% extends 'unfold/layouts/base.html' %}
 {% load i18n unfold %}
-{% load replace %}
 
 {% block breadcrumbs %}{% endblock %}
 
@@ -196,18 +195,11 @@
     <!-- JS per caricare immagini dinamicamente -->
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            const csrfToken = "{{ csrf_token }}";
-
             document.querySelectorAll('img[data-lesson-id]').forEach(function (img) {
                 const lessonId = img.dataset.lessonId;
-                
-                console.log(lessonId)
-                
+    
                 fetch(`/get_images/${lessonId}`, {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrfToken
-                    }
+                    method: "GET"
                 })
                 .then(response => {
                     if (!response.ok) throw new Error("Errore nella richiesta dell'immagine");
@@ -223,4 +215,5 @@
             });
         });
     </script>
+    
 {% endblock %}
