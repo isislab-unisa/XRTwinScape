@@ -14,6 +14,8 @@ from django.views.decorators.csrf import csrf_exempt
 import os
 import redis
 from redis.lock import Lock
+import mimetypes
+
 
 # Redis client
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
@@ -115,8 +117,6 @@ def complete_build(request):
     except Exception as e:
         print(f"[ERROR] Exception in complete_build: {str(e)}")
         return JsonResponse({"error": "An error occurred"}, status=500)
-
-import mimetypes
 
 @login_required
 @require_http_methods(['GET'])
