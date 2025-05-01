@@ -28,7 +28,7 @@ def call_api_and_save(self, lesson_id, training_type):
 
         print("Tentativo di acquisizione lock...")
         try:
-            acquired = lock.acquire(blocking=True, blocking_timeout=1 * 60 * 60)
+            acquired = lock.acquire(blocking=True, blocking_timeout=24 * 60 * 60)
             print(f"Acquired: {acquired}")
             if not acquired:
                 print(f"Could not acquire lock for lesson {lesson_id}, retrying...")
@@ -122,7 +122,7 @@ def fail_stuck_builds():
             
     lesson = None
     try:
-        timeout_minutes = 24 * 60 # 24 hours
+        timeout_minutes = 18 * 60 # 24 hours
         threshold = timezone.now() - timedelta(minutes=timeout_minutes)
 
         lesson = Lesson.objects.filter(status=Status.BUILDING, build_started_at__lt=threshold).first()
@@ -147,7 +147,7 @@ def fail_stuck_builds():
         print(f"Errore nell'acquisizione del lock: {e}")
     
     try:
-        if build_lock.locked():
+        if build_lock.locked() and build_lock.owned():
             build_lock.release()
     except Exception as e:
         print(f"Errore nell'acquisizione del lock: {e}")
