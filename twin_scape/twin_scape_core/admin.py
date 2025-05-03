@@ -59,27 +59,27 @@ class LessonAdmin(ModelAdmin):
             initial['user'] = request.user.pk
         return initial
     
-    def has_change_permission(self, request, obj=None):
-        has_permission = super().has_change_permission(request, obj)
-        if not has_permission:
-            return False
-        if obj is None:
-            return True
-        if obj.status in ['BUILT', 'BUILDING', 'RUNNING']:
-            return False
-        return True
+    # def has_change_permission(self, request, obj=None):
+    #     has_permission = super().has_change_permission(request, obj)
+    #     if not has_permission:
+    #         return False
+    #     if obj is None:
+    #         return True
+    #     if obj.status in ['BUILT', 'BUILDING', 'RUNNING']:
+    #         return False
+    #     return True
     
-    def has_delete_permission(self, request, obj=None):
-        has_permission = super().has_delete_permission(request, obj)
-        if not has_permission:
-            return False
-        if obj is None:
-            return True
-        if obj.status in ['RUNNING', 'BUILDING']:
-            return False
+    # def has_delete_permission(self, request, obj=None):
+    #     has_permission = super().has_delete_permission(request, obj)
+    #     if not has_permission:
+    #         return False
+    #     if obj is None:
+    #         return True
+    #     if obj.status in ['RUNNING', 'BUILDING']:
+    #         return False
         
-        if obj.user != request.user:
-            return False
-        return True
+    #     if obj.user != request.user:
+    #         return False
+    #     return True
 
 admin.site.register(Lesson, LessonAdmin)
