@@ -61,6 +61,8 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'rest_framework',
+    'rest_framework.authtoken',
     "unfold",  # before django.contrib.admin
     "unfold.contrib.filters",  # optional, if special filters are needed
     "unfold.contrib.forms",  # optional, if special form elements are needed
@@ -79,6 +81,15 @@ INSTALLED_APPS = [
     'twin_scape_core',
     'django_celery_beat',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
@@ -107,18 +118,24 @@ ROOT_URLCONF = 'twin_scape.urls'
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760 * 10  # 10 GB
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
         },
     },
-    "root": {
-        "handlers": ["console"],
-        "level": "WARNING",
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
     },
 }
+
+CSRF_COOKIE_SECURE = False
 
 TEMPLATES = [
     {
@@ -235,23 +252,23 @@ UNFOLD = {
                     },
                 ],
             },
-            # {
-            #     "title": _("Users & Groups"),
-            #     "separator": False,
-            #     "collapsible": True,
-            #     "items": [
-            #         {
-            #             "title": _("Users"),
-            #             "icon": "person",
-            #             "link": reverse_lazy("admin:auth_user_changelist"),
-            #         },
-            #         {
-            #             "title": _("Groups"),
-            #             "icon": "group",
-            #             "link": reverse_lazy("admin:auth_group_changelist"),
-            #         },
-            #     ],
-            # },
+            {
+                "title": _("Users & Groups"),
+                "separator": False,
+                "collapsible": True,
+                "items": [
+                    {
+                        "title": _("Users"),
+                        "icon": "person",
+                        "link": reverse_lazy("admin:auth_user_changelist"),
+                    },
+                    {
+                        "title": _("Groups"),
+                        "icon": "group",
+                        "link": reverse_lazy("admin:auth_group_changelist"),
+                    },
+                ],
+            },
             {
                 "title": _("Twin Scape Functionalities"),
                 "separator": False,

@@ -84,13 +84,24 @@ def build(request):
         call_api_and_save.apply_async(args=[lesson.id, value], queue='api_tasks')
     return redirect('/admin/')
 
-@require_http_methods(['POST'])
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.response import Response
+from django.core.mail import send_mail
+from django.http import JsonResponse
+from .models import Lesson
+import os
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+# @authentication_classes([TokenAuthentication])
 def complete_build(request):
     try:
-        status = request.POST.get('status')
-        lesson_id = request.POST.get('lesson_id')
-        ply_path = request.POST.get('ply_path')
-        
+        status = request.data.get('status')
+        lesson_id = request.data.get('lesson_id')
+        ply_path = request.data.get('ply_path')
+
         lesson = Lesson.objects.get(pk=lesson_id)
 
         if status == "COMPLETED":
@@ -109,14 +120,12 @@ def complete_build(request):
             fail_silently=False,
         )
 
-        if build_lock.locked():
-            build_lock.release()
-
-        return JsonResponse({"status": "success"}, status=200)
+        return Response({"status": "success"}, status=200)
 
     except Exception as e:
         print(f"[ERROR] Exception in complete_build: {str(e)}")
         return JsonResponse({"error": "An error occurred"}, status=500)
+
 
 @login_required
 @require_http_methods(['GET'])
