@@ -16,3 +16,5 @@ pip-system-certs
 django-redis
 django-celery-beat
 # django-templatetags-replace
+djangorestframework
+djangorestframework-simplejwt
