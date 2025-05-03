@@ -15,6 +15,9 @@ import os
 import redis
 from redis.lock import Lock
 import mimetypes
+from rest_framework.decorators import api_view, permission_classes, authentication_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 
 # Redis client
@@ -84,20 +87,15 @@ def build(request):
         call_api_and_save.apply_async(args=[lesson.id, value], queue='api_tasks')
     return redirect('/admin/')
 
-from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.response import Response
-from django.core.mail import send_mail
-from django.http import JsonResponse
-from .models import Lesson
-import os
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-# @authentication_classes([TokenAuthentication])
 def complete_build(request):
+    redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://redis:6379"))
+    lock = redis_client.lock("build_lock", timeout=60)
+
     try:
+        print(f"[LOCK] Lock attivo prima del rilascio? {'Sì' if lock.locked() else 'No'}")
+
         status = request.data.get('status')
         lesson_id = request.data.get('lesson_id')
         ply_path = request.data.get('ply_path')
@@ -126,6 +124,13 @@ def complete_build(request):
         print(f"[ERROR] Exception in complete_build: {str(e)}")
         return JsonResponse({"error": "An error occurred"}, status=500)
 
+    finally:
+        try:
+            redis_client.delete("build_lock")
+            print("[LOCK] Lock rilasciato con successo.")
+        except Exception as e:
+            print(f"[LOCK] Errore nel rilascio del lock: {e}")
+            return JsonResponse({"error": "An error occurred during lock release"}, status=500)
 
 @login_required
 @require_http_methods(['GET'])
