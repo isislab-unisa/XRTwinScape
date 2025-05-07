@@ -188,7 +188,7 @@ RUN /bin/bash -c "conda init"
 RUN /bin/bash -c "pip install 'fastapi[standard]' minio boto3"
 
 # CMD ["/bin/bash", "-l"]
-EXPOSE 8000
+EXPOSE 8090
 
 WORKDIR /full_pipe_mast3r_nerfstudio
 CMD ["fastapi", "run", "main.py", "--port", "8090", "--host", "0.0.0.0"]
