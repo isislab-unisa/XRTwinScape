@@ -1,82 +1,361 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <title>XRTwinScape Project</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XRTwinScape | Advancing Contextualized Learning for Industry 5.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #000;
-            color: #f0f0f0;
+            font-family: 'Inter', sans-serif;
         }
-        header {
-            background: #111;
-            padding: 1rem;
-            text-align: center;
-            border-bottom: 3px solid #009fe3;
+
+        .hero-bg {
+            /* The background image is now set via inline style in the header tag for easier customization */
+            /* background-color: #1a202c; /* Fallback dark background for hero */
+            background-size: cover; /* Ensure the image covers the entire area */
+            background-position: center; /* Center the image */
+            position: relative; /* Needed for the overlay */
         }
-        header img {
-            max-width: 200px;
-            height: auto;
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+            z-index: 1; /* Ensure overlay is above the background image */
         }
-        main {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background: #1a1a1a;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.7);
+        .hero-content {
+            position: relative; /* Ensure content is above the overlay */
+            z-index: 2;
         }
-        h1, h2 {
-            color: #00b4d8;
+
+        .section-title {
+            font-size: 2.25rem;
+            /* 36px */
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            /* 24px */
+            color: #2d3748;
+            /* Gray-800 */
         }
-        .center-message {
-            margin: 4rem 0;
-            text-align: center;
+
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            /* 12px */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            /* 24px */
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .eu-banner {
+            background-color: #003399;
+            /* EU Blue */
+            color: white;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .eu-flag-stars {
+            display: inline-block;
+            margin-right: 0.5rem;
             font-size: 1.2rem;
-            color: #ccc;
+            /* Adjust size as needed */
+            color: #FFCC00;
+            /* EU Gold */
         }
-        footer {
-            text-align: center;
-            margin-top: 4rem;
-            padding: 1rem;
-            font-size: 0.9rem;
-            background: #111;
-            color: #888;
-        }
-        a {
-            color: #90e0ef;
-            text-decoration: none;
-        }
-        a:hover {
-            text-decoration: underline;
+
+        nav a:hover {
+            color: #60a5fa;
+            /* Tailwind blue-400 */
         }
     </style>
 </head>
-<body>
-    <header>
-        <img src="twinscape_logo.png" alt="Twinscape Logo">
-    </header>
-    <main>
-        <h1>XRTwinScape</h1>
-        <h2>Advancing Contextualized Learning and Training for Industry 5.0 Through Immersive Virtual Environments</h2>
 
-        <h2>Project Description</h2>
-        <p>
-            XRTwinScape tackles the challenge of preparing workers in realistic virtual training environments. These environments replicate real-world workplaces, offering familiar surroundings and hands-on experience, while overcoming security and replicability limitations. XRTwinScape uses digital twin technology, including Gaussian Splatting for rapid, high-quality digital twin creation.
-        </p>
+<body class="bg-gray-50 text-gray-700">
 
-
-        <div class="center-message">
-            <p>More information will be available soon.<br>Stay tuned!</p>
+    <nav class="bg-white shadow-md sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <img src="media/twinscape_logo.png" alt="XRTwinScape Logo" class="h-10 w-10">
+                <span class="font-bold text-xl text-gray-700">XRTwinScape</span>
+            </div>            
+            <div class="space-x-4">
+                <a href="#overview" class="text-gray-600">Overview</a>
+                <a href="#components" class="text-gray-600">Components</a>
+                <a href="#objectives" class="text-gray-600">Objectives</a>
+                <a href="#use-cases" class="text-gray-600">Use Cases</a>
+                <a href="#technology" class="text-gray-600">Technology</a>
+                <a href="#benefits" class="text-gray-600">Benefits</a>
+                <a href="#consortium" class="text-gray-600">Consortium</a>
+                <a href="#vision" class="text-gray-600">Vision</a>
+            </div>
         </div>
+    </nav>
+
+<header class="hero-bg text-white py-20 px-6"
+    style="background-image: url('media/background.gif');">
+    <div class="hero-overlay"></div>
+    <div class="container mx-auto text-center hero-content">
+        <h1 class="text-5xl font-bold mb-4">XRTwinScape</h1>
+        <p class="text-2xl mb-8">Advancing Contextualized Learning and Training for Industry 5.0 Through Immersive
+            Virtual Environments</p>
+        <a href="https://github.com/your-repo/XRTwinScape" target="_blank" rel="noopener noreferrer"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-3 px-6 rounded-lg text-lg transition duration-300">
+            View on GitHub
+        </a>
+        <p class="mt-4 text-sm">Our tools and applications will be released as Open Source (CC BY-NC).</p>
+    </div>
+</header>
+
+    <main class="container mx-auto px-6 py-12">
+
+        <section id="overview" class="py-12">
+            <h2 class="section-title text-center">Project Overview</h2>
+            <div class="max-w-3xl mx-auto text-lg text-gray-600 space-y-4">
+                <p>XRTwinScape revolutionizes workforce training by enabling effective preparation in realistic, virtual
+                    environments without the inherent risks and limitations of physical spaces. Our innovative solution
+                    leverages highly detailed 1:1 virtual representations of physical workspaces (digital twins) and
+                    immersive training lessons for contextualized learning.</p>
+                <p>We utilize cutting-edge technology, including <strong class="text-blue-600">Gaussian
+                        Splatting</strong>, an AI-powered rendering technique, for rapid, high-fidelity digital twin
+                    creation that preserves exceptional visual detail.</p>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="components" class="py-12">
+            <h2 class="section-title text-center">Key Components</h2>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="card">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-600">TwinScape Editor (New Enabler)</h3>
+                    <p class="text-gray-600">An intuitive web application that empowers users to:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-600">
+                        <li>Generate digital twins of real-world work scenarios from simple photographs.</li>
+                        <li>Augment these digital twins with interactive educational content, creating XR training
+                            lessons.</li>
+                        <li>Publish lessons seamlessly to the XR2Learn platform.</li>
+                    </ul>
+                </div>
+                <div class="card">
+                    <h3 class="text-2xl font-semibold mb-3 text-blue-600">TwinScape Player (New Beacon Application)</h3>
+                    <p class="text-gray-600">An immersive XR application that allows trainees to:</p>
+                    <ul class="list-disc list-inside mt-2 space-y-1 text-gray-600">
+                        <li>Interact with digital twins downloaded from the XR2Learn platform marketplace.</li>
+                        <li>Engage in task-based learning within these realistic virtual environments.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="objectives" class="py-12">
+            <h2 class="section-title text-center">Project Objectives</h2>
+            <div class="max-w-3xl mx-auto">
+                <ul class="list-disc list-inside space-y-3 text-lg text-gray-600">
+                    <li><strong class="text-gray-800">Enhance Digitalization:</strong> Improve our technology for
+                        creating faithful digital twins of work environments, complete with multimodal attachments.</li>
+                    <li><strong class="text-gray-800">Platform Integration:</strong> Seamlessly integrate these digital
+                        twins into the XR2Learn platform, making them accessible as marketplace assets.</li>
+                    <li><strong class="text-gray-800">Develop the XRTwinScape System:</strong> Design and build the
+                        TwinScape Editor, TwinScape Player, and TwinScapeLesson assets.</li>
+                    <li><strong class="text-gray-800">Validate through Use Cases:</strong> Design, implement, and
+                        evaluate three distinct Industry 5.0 use case scenarios using the XR2Learn Educational Framework
+                        and the ASSURE model.</li>
+                </ul>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="use-cases" class="py-12">
+            <h2 class="section-title text-center">Target Use Cases & Pilot Programs</h2>
+            <p class="text-center text-lg text-gray-600 mb-8">XRTwinScape will be validated through three pilot use
+                cases aligned with Industry 5.0 principles, involving 220 trainees across three educational
+                applications:</p>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Industrial Training for Unemployed Individuals
+                    </h3>
+                    <p class="text-gray-600">Providing 60 participants with foundational knowledge of industrial tools
+                        and electrical panels in a safe, virtual replica of Formamentis' industrial plant technician
+                        lab, enhancing employability.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Problem-Solving for Employees</h3>
+                    <p class="text-gray-600">Targeting 60 company employees to improve their ability to analyze
+                        problems, evaluate alternatives, and execute timely solutions within virtualized industrial
+                        systems under pressure.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Career Guidance for High School Students</h3>
+                    <p class="text-gray-600">Introducing 100 high school students to Industry 5.0 concepts through
+                        virtual plant tours, enhancing their understanding of industrial processes, technologies, and
+                        career opportunities.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="technology" class="py-12 bg-gray-100 rounded-lg">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center">Technology Highlight: Gaussian Splatting</h2>
+                <div class="max-w-3xl mx-auto text-lg text-gray-600 space-y-4">
+                    <p>XRTwinScape leverages <strong class="text-blue-600">Gaussian Splatting</strong>, a novel AI-based
+                        rendering technique that:</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>Creates highly detailed and faithful 3D reconstructions of real-world spaces from standard
+                            images or videos.</li>
+                        <li>Offers significant advantages over traditional methods like photogrammetry by simplifying
+                            scene representation, improving visual quality (especially on reflective surfaces), and
+                            enabling real-time rendering.</li>
+                        <li>Reduces the time and cost associated with creating virtual environments, making advanced XR
+                            training more accessible.</li>
+                    </ul>
+                    <div class="mt-6 text-center">
+                        <img src="media/Annotation_Player.gif"
+                            alt="Gaussian Splatting Concept" class="mx-auto rounded-lg shadow-lg">
+                        <p class="text-sm mt-2 text-gray-500">Example of a reconstruction made with Gaussian Splatting
+                            technology.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="benefits" class="py-12">
+            <h2 class="section-title text-center">Benefits of XRTwinScape</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Enhanced Realism & Relevance</h3>
+                    <p class="text-gray-600">Accurate replication of work environments for realistic simulations,
+                        improving training effectiveness.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Increased Engagement</h3>
+                    <p class="text-gray-600">Immersive lessons and interactive content boost learner engagement and
+                        knowledge retention.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Cost & Time Efficiency</h3>
+                    <p class="text-gray-600">Drastic reduction in costs and time for virtual environment creation using
+                        Gaussian Splatting.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Accessibility & Scalability</h3>
+                    <p class="text-gray-600">Enables remote training at scale and broad access to quality resources.</p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Collaboration & Customization</h3>
+                    <p class="text-gray-600">Open-source tools encourage collaboration and adaptation across industries.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3 class="text-xl font-semibold mb-2 text-blue-600">Future-Proofing</h3>
+                    <p class="text-gray-600">Designed for sustainability as a SaaS cloud platform beyond the project's
+                        duration.</p>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="consortium" class="py-12 bg-gray-100 rounded-lg">
+            <div class="container mx-auto px-6">
+                <h2 class="section-title text-center">The Consortium</h2>
+                <p class="text-center text-lg text-gray-600 mb-8">XRTwinScape is a collaborative effort bringing
+                    together the expertise of three key partners:</p>
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="card text-center">
+                        <img src="media/formamentis_logo.jpg" alt="FMTS Logo"
+                            class="mx-auto mb-4 rounded-full">
+                        <h3 class="text-xl font-semibold mb-1 text-blue-700">Formamentis SPA (FMTS)</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-2">Coordinator</p>
+                        <p class="text-gray-600 text-sm">Expertise in education, employment services, industrial
+                            training (Eduwork complex).</p>
+                    </div>
+                    <div class="card text-center">
+                        <img src="media/cerict_logo.jpg" alt="CeRICT Logo"
+                            class="mx-auto mb-10 rounded-full">
+                        <h3 class="text-xl font-semibold mb-1 text-red-700">CeRICT scrl</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-2">Research & Development</p>
+                        <p class="text-gray-600 text-sm">Expertise in XR, digital reconstruction, AI, cybersecurity
+                            (Univ. of Salerno - ISISLab).</p>
+                    </div>
+                    <div class="card text-center">
+                        <img src="media/picaresque-logo.png" alt="Picaresque Logo"
+                            class="mx-auto mb-4 rounded-full" style="width: 230px; height: 200px;">
+                        <h3 class="text-xl font-semibold mb-1 text-green-700">Picaresque SRL (PICA)</h3>
+                        <p class="text-sm font-medium text-gray-500 mb-2">Software & XR Development</p>
+                        <p class="text-gray-600 text-sm">Specializes in immersive video games, XR applications,
+                            gamification.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="my-12 border-gray-300">
+
+        <section id="vision" class="py-12">
+            <h2 class="section-title text-center">Future Vision & Sustainability</h2>
+            <div class="max-w-3xl mx-auto text-lg text-gray-600 space-y-4">
+                <p>Beyond the initial project phase, XRTwinScape aims to be a sustainable resource for institutions and
+                    industries. It will be offered as a <strong class="text-blue-600">Software as a Service (SaaS) cloud
+                        platform</strong>, providing ongoing access to its powerful tools for improving training
+                    processes and workforce preparedness.</p>
+                <p>Picaresque also plans to establish an independent publishing platform, <strong
+                        class="text-blue-600">TwinScapeWorld</strong>, to ensure the long-term accessibility of training
+                    materials and resources developed during the project. This platform will allow users to upload,
+                    share (free or paid), and access digital twins and TwinScapeLessons, extending the project's impact.
+                </p>
+            </div>
+        </section>
+
     </main>
-    <footer>
-        &copy; 2025 XRTwinScape Project – All rights reserved.
+
+    <footer class="bg-gray-800 text-gray-300 py-12 px-6">
+        <div class="container mx-auto text-center">
+            <p>&copy; <span id="currentYear"></span> XRTwinScape Consortium. All Rights Reserved.</p>
+            <p class="text-sm mt-2">Released under the Creative Commons Attribution-NonCommercial (CC BY-NC) license.
+            </p>
+            <p class="text-xs mt-4">This project has received funding from the European Union’s Horizon Europe research
+                and innovation programme under grant agreement No 101092851 (XR2Learn).</p>
+            <div class="mt-4">
+            </div>
+        </div>
     </footer>
+
+    <script>
+        // Smooth scroll for navigation links
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Set current year in footer
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+
 </body>
+
 </html>
