@@ -103,6 +103,8 @@ services:
     container_name: full_gaussian_pipe
     environment:
       - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
     gpus: all
     user: root
     shm_size: "48g"	
