@@ -14,12 +14,15 @@ import shutil
 import requests
 import threading
 import subprocess
+import dotenv
+import os
 
+dotenv.load_dotenv()
 
 MINIO_EDNPOINT = "http://minio:9000"
-MINIO_ROOT_USER = "minioadmin"
-MINIO_ROOT_PASSWORD = "minioadmin123"
-AWS_STORAGE_BUCKET_NAME = "lessons-media"
+MINIO_ROOT_USER = os.getenv("MINIO_ROOT_USER")
+MINIO_ROOT_PASSWORD = os.getenv("MINIO_ROOT_PASSWORD")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 CALLBACK_ENDPOINT = "http://web:8001/complete_build/"
 TOKEN_REQUEST_ENDPOINT = "http://web:8001/api/token/"
 
