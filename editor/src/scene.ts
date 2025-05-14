@@ -24,6 +24,7 @@ import { SceneState } from './scene-state';
 import { Splat } from './splat';
 import { SplatOverlay } from './splat-overlay';
 import { Underlay } from './underlay';
+import { AnnotationElement } from './annotationsElement';
 
 class Scene {
     events: Events;
@@ -214,6 +215,9 @@ class Scene {
         this.add(this.outline);
         this.underlay = new Underlay();
         this.add(this.underlay);
+
+        this.add(new AnnotationElement());
+
     }
 
     start() {

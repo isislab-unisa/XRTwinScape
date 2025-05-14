@@ -26,6 +26,7 @@ import { vertexShader, fragmentShader, gsplatCenter } from './shaders/splat-shad
 import { State } from './splat-state';
 import { Transform } from './transform';
 import { TransformPalette } from './transform-palette';
+import { AnnotationData, Annotation, ContentType, FilterOnType, FilterType, ExpertiseLevel, EmotionalState } from './annotation';
 
 const vec = new Vec3();
 const veca = new Vec3();
@@ -47,6 +48,7 @@ const boundingPoints =
 class Splat extends Element {
     asset: Asset;
     splatData: GSplatData;
+    annotations: AnnotationData;
     numSplats = 0;
     numDeleted = 0;
     numHidden = 0;
@@ -185,6 +187,7 @@ class Splat extends Element {
         instance.sorter.on('updated', () => {
             this.changedCounter++;
         });
+        this.fillFakeAnnotationData();
     }
 
     destroy() {
@@ -192,6 +195,63 @@ class Splat extends Element {
         this.entity.destroy();
         this.asset.registry.remove(this.asset);
         this.asset.unload();
+    }
+
+    fillFakeAnnotationData()
+    {
+        this.annotations = new AnnotationData;
+        this.annotations.splat = "splat.ply";
+
+        // Annotation 1 – no rules or variants
+        const annotation1 = new Annotation(1);
+        annotation1.position = new Vec3(0, 0, 0);
+        annotation1.defaultContent = {
+            content: "Welcome to the training zone!",
+            contentType: ContentType.Text,
+            rules: []
+        };
+        annotation1.activity = 1;
+
+        // Annotation 2 – with variant for Expert users
+        const annotation2 = new Annotation(2);
+        annotation2.position = new Vec3(1, 0, 2);
+        annotation2.defaultContent = {
+            content: "This machine is used for quality control.",
+            contentType: ContentType.Text,
+            rules: []
+        };
+        annotation2.variantContents = [
+            {
+                content: "Expert Tip: Check the calibration logs every 4 hours.",
+                contentType: ContentType.Text,
+                rules: [
+                    {
+                        type: FilterType.ShowIf,
+                        on: FilterOnType.Expertise,
+                        filter: [ExpertiseLevel.Expert]
+                    }
+                ]
+            }
+        ];
+        annotation2.activity = 2;
+
+        // Annotation 3 – with emotional filter rule
+        const annotation3 = new Annotation(3);
+        annotation3.position = new Vec3(-2, 0, 1);
+        annotation3.defaultContent = {
+            content: "You're doing great. Keep going!",
+            contentType: ContentType.Audio,
+            rules: []
+        };
+        annotation3.rule = {
+            type: FilterType.ShowIf,
+            on: FilterOnType.Emotional,
+            filter: [EmotionalState.Frustrated]
+        };
+        annotation3.activity = 3;
+
+        // Add all annotations to the data
+        this.annotations.annotations.push(annotation1, annotation2, annotation3);
     }
 
     updateState(changedState = State.selected) {
