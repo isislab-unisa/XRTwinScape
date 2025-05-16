@@ -52,21 +52,32 @@ class ScenePanel extends Container {
         });
         sceneNew.dom.appendChild(createSvg(sceneNewSvg));
 
+        const sceneAnnotationImport = new Container({
+            class: 'panel-header-button'
+        });
+        sceneAnnotationImport.dom.appendChild(createSvg(sceneImportSvg));
+
         sceneHeader.append(sceneIcon);
         sceneHeader.append(sceneLabel);
         sceneHeader.append(sceneImport);
         sceneHeader.append(sceneNew);
+        sceneHeader.append(sceneAnnotationImport);
 
         sceneImport.on('click', async () => {
             await events.invoke('scene.import');
         });
-
+        
         sceneNew.on('click', () => {
             events.invoke('doc.new');
         });
 
-        tooltips.register(sceneImport, 'Import Scene', 'top');
+        sceneAnnotationImport.on('click', async () => {
+            await events.invoke('scene.annotationImport');
+        });
+
+        tooltips.register(sceneImport, 'Import Scene', 'top');        
         tooltips.register(sceneNew, 'New Scene', 'top');
+        tooltips.register(sceneAnnotationImport, 'Import Annotations', 'top');
 
         const splatList = new SplatList(events);
 

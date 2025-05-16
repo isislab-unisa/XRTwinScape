@@ -30,7 +30,7 @@ class AnnotationElement extends Element {
 
         const update = (splat: Splat) => {
             this.clearMeshes();
-            if (!splat) {
+            if (!splat || !splat.annotations) {
                 return;
             }
 

@@ -8,6 +8,8 @@ import { Writer, DownloadWriter, FileStreamWriter } from './serialize/writer';
 import { Splat } from './splat';
 import { serializePly, serializePlyCompressed, SerializeSettings, serializeSplat, serializeViewer, ViewerExportSettings } from './splat-serialize';
 import { localize } from './ui/localization';
+import { Annotation, AnnotationContent, AnnotationData, ContentType, EmotionalState, ExpertiseLevel, FilterOnType, FilterType, SkillLevel } from './annotation';
+import "reflect-metadata";
 
 // ts compiler and vscode find this type, but eslint does not
 type FilePickerAcceptType = unknown;
@@ -55,6 +57,12 @@ const filePickerTypes: { [key: string]: FilePickerAcceptType } = {
         description: 'Viewer ZIP',
         accept: {
             'application/zip': ['.zip']
+        }
+    },
+    'annotation': {
+        description: 'Annotations json',
+        accept: {
+            'application/json': ['.json']
         }
     }
 };
@@ -124,6 +132,68 @@ const loadCameraPoses = async (url: string, filename: string, events: Events) =>
     }
 };
 
+async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
+    const data = new AnnotationData();
+    data.splat = raw.splat;
+
+    for (const ann of raw.annotations) {
+        const annotation = new Annotation(ann.id);
+        annotation.position = new Vec3(ann.position.x, ann.position.y, ann.position.z);
+
+        annotation.defaultContent = new AnnotationContent();
+        annotation.defaultContent.content = ann.defaultContent.content;
+        annotation.defaultContent.contentType = ContentType[ann.defaultContent.contentType as keyof typeof ContentType];
+        annotation.defaultContent.rules = (ann.defaultContent.rules || []).map((rule: any) => {
+            return {
+                type: FilterType[rule.type as keyof typeof FilterType],
+                on: FilterOnType[rule.on as keyof typeof FilterOnType],
+                filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
+            };
+        });
+
+        annotation.variantContents = (ann.variantContents || []).map((vc: any) => {
+            const content = new AnnotationContent();
+            content.content = vc.content;
+            content.contentType = ContentType[vc.contentType as keyof typeof ContentType];
+            content.rules = (vc.rules || []).map((rule: any) => {
+                return {
+                    type: FilterType[rule.type as keyof typeof FilterType],
+                    on: FilterOnType[rule.on as keyof typeof FilterOnType],
+                    filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
+                };
+            });
+            return content;
+        });
+
+        if (ann.rule) {
+            annotation.rule = {
+                type: FilterType[ann.rule.type as keyof typeof FilterType],
+                on: FilterOnType[ann.rule.on as keyof typeof FilterOnType],
+                filter: ann.rule.filter.map((val: string) => parseEnumByType(ann.rule.on, val))
+            };
+        }
+
+        annotation.activity = ann.activity;
+        data.annotations.push(annotation);
+    }
+
+    return data;
+}
+
+// Helper to map string values to correct enum based on the rule's "on" field
+function parseEnumByType(on: keyof typeof FilterOnType, value: string): number {
+    switch (on) {
+        case "Emotional":
+            return EmotionalState[value as keyof typeof EmotionalState];
+        case "Skill":
+            return SkillLevel[value as keyof typeof SkillLevel];
+        case "Expertise":
+            return ExpertiseLevel[value as keyof typeof ExpertiseLevel];
+        default:
+            throw new Error(`Unknown filter type: ${on}`);
+    }
+}
+
 // initialize file handler events
 const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, remoteStorageDetails: RemoteStorageDetails) => {
 
@@ -161,8 +231,49 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
         }
     };
 
+    const handleAnnotationImport = async (url: string, filename?: string) => {
+        try {
+            if (!filename) {
+                // extract filename from url if one isn't provided
+                try {
+                    filename = new URL(url, document.baseURI).pathname.split('/').pop();
+                } catch (e) {
+                    filename = url;
+                }
+            }
+
+            const lowerFilename = (filename || url).toLowerCase();
+            if (lowerFilename.endsWith('.json')) {
+                try {
+                    const resp = await fetch(url);
+                    if (resp.ok) {
+                        const raw = await resp.json();
+                        const annotations = await loadAnnotationDataFromJSON(raw);
+
+                        const selectedSplat = scene.elements.find(e => e.type === ElementType.splat);
+                        (selectedSplat as Splat).annotations = annotations;
+                    }
+                } catch (err) {
+                    console.warn(`No annotation JSON found at ${url}`, err);
+                }
+            } else {
+                throw new Error('Unsupported file type');
+            }
+        } catch (error) {
+            await events.invoke('showPopup', {
+                type: 'error',
+                header: localize('popup.error-loading'),
+                message: `${error.message ?? error} while loading '${filename}'`
+            });
+        }
+    };
+
     events.function('import', (url: string, filename?: string, focusCamera = true, animationFrame = false) => {
         return handleImport(url, filename, focusCamera, animationFrame);
+    });
+
+    events.function('annotationImport', (url: string, filename?: string) => {
+        return handleAnnotationImport(url, filename);
     });
 
     // create a file selector element as fallback when showOpenFilePicker isn't available
@@ -184,6 +295,27 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
             }
         };
         document.body.append(fileSelector);
+    }
+
+    // create a file selector element as fallback when showOpenFilePicker isn't available
+    let annotationFileSelector: HTMLInputElement;
+    if (!window.showOpenFilePicker) {
+        annotationFileSelector = document.createElement('input');
+        annotationFileSelector.setAttribute('id', 'file-selector');
+        annotationFileSelector.setAttribute('type', 'file');
+        annotationFileSelector.setAttribute('accept', '.json');
+        annotationFileSelector.setAttribute('multiple', 'false');
+
+        annotationFileSelector.onchange = async () => {
+            const files = annotationFileSelector.files;
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const url = URL.createObjectURL(file);
+                await handleAnnotationImport(url, file.name);
+                URL.revokeObjectURL(url);
+            }
+        };
+        document.body.append(annotationFileSelector);
     }
 
     // create the file drag & drop handler
@@ -288,6 +420,12 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
                     console.error(error);
                 }
             }
+        }
+    });
+
+    events.function('scene.annotationImport', async () => {
+        if (annotationFileSelector) {
+            annotationFileSelector.click();
         }
     });
 

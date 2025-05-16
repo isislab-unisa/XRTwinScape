@@ -187,7 +187,7 @@ class Splat extends Element {
         instance.sorter.on('updated', () => {
             this.changedCounter++;
         });
-        this.fillFakeAnnotationData();
+        //this.fillFakeAnnotationData();
     }
 
     destroy() {
