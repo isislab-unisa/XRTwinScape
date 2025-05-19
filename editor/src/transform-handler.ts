@@ -1,3 +1,5 @@
+import { Annotation } from './annotation';
+import { AnnotationTransformHandler } from './annotation-transform-handler';
 import { EntityTransformHandler } from './entity-transform-handler';
 import { Events } from './events';
 import { registerPivotEvents } from './pivot';
@@ -25,6 +27,7 @@ const registerTransformHandlerEvents = (events: Events) => {
     // bind transform target when selection changes
     const entityTransformHandler = new EntityTransformHandler(events);
     const splatsTransformHandler = new SplatsTransformHandler(events);
+    const annotationTransformHandler = new AnnotationTransformHandler(events);
 
     const update = (splat: Splat) => {
         if (!splat) {
@@ -38,8 +41,20 @@ const registerTransformHandlerEvents = (events: Events) => {
         }
     };
 
+    const updateAnnotation = (annotation: Annotation) => {
+        if(!annotation)
+        {
+            setTransformHandler(null);
+        }
+        else
+        {
+            setTransformHandler(annotationTransformHandler);
+        }        
+    }
+
     events.on('selection.changed', update);
     events.on('splat.stateChanged', update);
+    events.on('annotationList.selectionChanged', updateAnnotation); // TODO fire event on annotationList ui
 
     registerPivotEvents(events);
 };

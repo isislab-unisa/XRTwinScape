@@ -7,6 +7,7 @@ import sceneImportSvg from './svg/import.svg';
 import sceneNewSvg from './svg/new.svg';
 import { Tooltips } from './tooltips';
 import { Transform } from './transform';
+import { AnnotationList } from './annotation-list';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -103,10 +104,36 @@ class ScenePanel extends Container {
         transformHeader.append(transformIcon);
         transformHeader.append(transformLabel);
 
+        const annotationHeader = new Container({
+            class: 'panel-header'
+        });
+
+        const annotationIcon = new Label({
+            text: '\uE111',
+            class: 'panel-header-icon'
+        });
+
+        const annotationLabel = new Label({
+            text: 'ANNOTATIONS',
+            class: 'panel-header-label'
+        });
+
+        annotationHeader.append(annotationIcon);
+        annotationHeader.append(annotationLabel);
+
+        const annotationList = new AnnotationList(events);
+
+        const annotationListContainer = new Container({
+            class: 'splat-list-container'
+        });
+        annotationListContainer.append(annotationList);        
+
         this.append(sceneHeader);
         this.append(splatListContainer);
         this.append(transformHeader);
         this.append(new Transform(events));
+        this.append(annotationHeader);
+        this.append(annotationListContainer);
         this.append(new Element({
             class: 'panel-header',
             height: 20
