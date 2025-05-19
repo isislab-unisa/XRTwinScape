@@ -349,6 +349,7 @@ const localizeInit = () => {
                     'popup.copy-to-clipboard': 'Copy link to clipboard',
 
                     // Right toolbar
+                    'tooltip.annotation-hide': 'Show/Hide Annotations',
                     'tooltip.splat-mode': 'Splat Mode ( M )',
                     'tooltip.show-hide': 'Show/Hide Splats ( Space )',
                     'tooltip.frame-selection': 'Frame Selection ( F )',

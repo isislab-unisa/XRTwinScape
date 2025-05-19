@@ -6,6 +6,7 @@ import { Splat } from "./splat";
 class AnnotationElement extends Element {
     material: ShaderMaterial;
     instances: MeshInstance[];
+    hidden: boolean;
 
     constructor() {
         super(ElementType.debug);
@@ -34,18 +35,26 @@ class AnnotationElement extends Element {
                 return;
             }
 
-            splat.annotations.annotations.forEach(annotation => {
-                const testMesh = Mesh.fromGeometry(this.scene.app.graphicsDevice, new SphereGeometry({ radius: 0.02 }));
-                const newInstance = this.addMesh(testMesh);
-                newInstance.node.setPosition(annotation.position)
-            })
-            
-            this.scene.debugLayer.addMeshInstances(this.instances, true);
-
+            if(!this.hidden){
+                splat.annotations.annotations.forEach(annotation => {
+                    const testMesh = Mesh.fromGeometry(this.scene.app.graphicsDevice, new SphereGeometry({ radius: 0.02 }));
+                    const newInstance = this.addMesh(testMesh);
+                    newInstance.node.setPosition(annotation.position)
+                })
+                
+                this.scene.debugLayer.addMeshInstances(this.instances, true);
+            }
+            this.scene.forceRender = true;
         }
 
         this.scene.events.on('selection.changed', (selection: Splat) => {
             update(selection);
+        });
+
+        this.scene.events.on('scene.showHideAnnotations', () => {
+            this.hidden = !this.hidden;
+            const selSplat = this.scene.events.invoke('selection') as Splat;
+            update(selSplat);
         });
     }
 
