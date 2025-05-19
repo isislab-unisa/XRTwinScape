@@ -250,8 +250,12 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
                         const raw = await resp.json();
                         const annotations = await loadAnnotationDataFromJSON(raw);
 
-                        const selectedSplat = scene.elements.find(e => e.type === ElementType.splat);
-                        (selectedSplat as Splat).annotations = annotations;
+                        const selectedSplat = events.invoke('selection') as Splat
+                        if(selectedSplat)
+                        {
+                            selectedSplat.annotations = annotations;
+                            events.fire('selection.changed', selectedSplat);
+                        }
                     }
                 } catch (err) {
                     console.warn(`No annotation JSON found at ${url}`, err);

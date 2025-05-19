@@ -28,6 +28,11 @@ class RightToolbar extends Container {
             event.stopPropagation();
         });
 
+        const annotationModeToggle = new Button({
+            id: 'right-toolbar-mode-toggle',
+            class: 'right-toolbar-toggle'
+        });
+
         const ringsModeToggle = new Button({
             id: 'right-toolbar-mode-toggle',
             class: 'right-toolbar-toggle'
@@ -63,6 +68,8 @@ class RightToolbar extends Container {
         const ringsDom = createSvg(ringsSvg);
         ringsDom.style.display = 'none';
 
+        annotationModeToggle.dom.appendChild(createSvg(ringsSvg))
+
         ringsModeToggle.dom.appendChild(centersDom);
         ringsModeToggle.dom.appendChild(ringsDom);
         showHideSplats.dom.appendChild(createSvg(showHideSplatsSvg));
@@ -70,6 +77,7 @@ class RightToolbar extends Container {
         cameraReset.dom.appendChild(createSvg(cameraResetSvg));
         colorPanel.dom.appendChild(createSvg(colorPanelSvg));
 
+        this.append(annotationModeToggle);
         this.append(ringsModeToggle);
         this.append(showHideSplats);
         this.append(new Element({ class: 'right-toolbar-separator' }));
@@ -79,6 +87,7 @@ class RightToolbar extends Container {
         this.append(new Element({ class: 'right-toolbar-separator' }));
         this.append(options);
 
+        tooltips.register(annotationModeToggle, localize('tooltip.annotation-hide'), 'left');
         tooltips.register(ringsModeToggle, localize('tooltip.splat-mode'), 'left');
         tooltips.register(showHideSplats, localize('tooltip.show-hide'), 'left');
         tooltips.register(cameraFrameSelection, localize('tooltip.frame-selection'), 'left');
@@ -87,6 +96,10 @@ class RightToolbar extends Container {
         tooltips.register(options, localize('tooltip.view-options'), 'left');
 
         // add event handlers
+
+        annotationModeToggle.on('click', () => {
+            events.fire('scene.showHideAnnotations');
+        });
 
         ringsModeToggle.on('click', () => {
             events.fire('camera.toggleMode');
