@@ -1,3 +1,4 @@
+import { Annotation } from './annotation';
 import { Element, ElementType } from './element';
 import { Events } from './events';
 import { Scene } from './scene';
@@ -5,6 +6,7 @@ import { Splat } from './splat';
 
 const registerSelectionEvents = (events: Events, scene: Scene) => {
     let selection: Splat = null;
+    let annotationSelected: Annotation = null;
 
     const setSelection = (splat: Splat) => {
         if (splat !== selection && (!splat || splat.visible)) {
@@ -20,6 +22,22 @@ const registerSelectionEvents = (events: Events, scene: Scene) => {
 
     events.function('selection', () => {
         return selection;
+    });
+
+    const setAnnotationSelection = (annotation: Annotation) => {
+        if (annotation !== annotationSelected) {
+            const prev = annotationSelected;
+            annotationSelected = annotation;
+            events.fire('annotationList.selectionChanged', annotationSelected, prev);
+        }
+    };
+
+    events.on('annotationSelection', (annotation: Annotation) => {
+        setAnnotationSelection(annotation);
+    });
+
+    events.function('annotationSelection', () => {
+        return annotationSelected;
     });
 
     events.on('selection.next', () => {
