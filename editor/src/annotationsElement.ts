@@ -2,6 +2,7 @@ import { BlendState, GraphNode, Mesh, MeshInstance, SEMANTIC_COLOR, SEMANTIC_POS
 import { Element, ElementType } from './element';
 import { vertexShader, fragmentShader } from './shaders/debug-shader';
 import { Splat } from "./splat";
+import { Annotation } from "./annotation";
 
 class AnnotationElement extends Element {
     material: ShaderMaterial;
@@ -53,6 +54,11 @@ class AnnotationElement extends Element {
 
         this.scene.events.on('scene.showHideAnnotations', () => {
             this.hidden = !this.hidden;
+            const selSplat = this.scene.events.invoke('selection') as Splat;
+            update(selSplat);
+        });
+
+        this.scene.events.on('annotation.moved', (annotation: Annotation) =>{
             const selSplat = this.scene.events.invoke('selection') as Splat;
             update(selSplat);
         });

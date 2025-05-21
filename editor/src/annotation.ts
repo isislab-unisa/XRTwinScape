@@ -1,4 +1,5 @@
-import { Vec3 } from "playcanvas";
+import { Quat, Vec3 } from "playcanvas";
+import { Transform } from "./transform";
 
 enum ContentType {Text, Image, Video, Audio};
 enum EmotionalState {Bored, Engaged, Frustrated};
@@ -19,6 +20,19 @@ class Annotation
     constructor(id: number) {
         this.id = id;
     }
+
+    getPivot(mode: 'center' | 'boundCenter', selection: boolean, result: Transform) {
+        switch (mode) {
+            case 'center':
+                result.set(this.position, Quat.IDENTITY, Vec3.ONE);
+                break;
+            case 'boundCenter':
+                // TODO implement alternative for bound center
+                result.set(this.position, Quat.IDENTITY, Vec3.ONE);
+                break;
+        }
+    }
+
 }
 
 class AnnotationContent
