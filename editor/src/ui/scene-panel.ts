@@ -118,8 +118,20 @@ class ScenePanel extends Container {
             class: 'panel-header-label'
         });
 
+        const sceneAnnotationExport = new Container({
+            class: 'panel-header-button'
+        });
+        sceneAnnotationExport.dom.appendChild(createSvg(sceneImportSvg));
+
+        sceneAnnotationExport.on('click', async () => {
+            await events.invoke('scene.annotationExport');
+        });
+
+        tooltips.register(sceneAnnotationExport, 'Export Annotations', 'top');
+
         annotationHeader.append(annotationIcon);
         annotationHeader.append(annotationLabel);
+        annotationHeader.append(sceneAnnotationExport);
 
         const annotationList = new AnnotationList(events);
 

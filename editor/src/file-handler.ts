@@ -1,4 +1,4 @@
-import { path, Vec3 } from 'playcanvas';
+import { JsonHandler, path, Vec3 } from 'playcanvas';
 
 import { CreateDropHandler } from './drop-handler';
 import { ElementType } from './element';
@@ -180,6 +180,49 @@ async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
     return data;
 }
 
+async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
+    const raw: any = {
+        splat: data.splat,
+        annotations: data.annotations.map((ann) => {
+            const obj: any = {
+                id: ann.id,
+                position: { x: ann.position.x, y: ann.position.y, z: ann.position.z },
+                defaultContent: {
+                    content: ann.defaultContent.content,
+                    contentType: ContentType[ann.defaultContent.contentType],
+                    rules: ann.defaultContent.rules.map((rule) => ({
+                        type: FilterType[rule.type],
+                        on: FilterOnType[rule.on],
+                        filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
+                    })),
+                },
+                variantContents: ann.variantContents.map((vc) => ({
+                    content: vc.content,
+                    contentType: ContentType[vc.contentType],
+                    rules: vc.rules.map((rule) => ({
+                        type: FilterType[rule.type],
+                        on: FilterOnType[rule.on],
+                        filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
+                    })),
+                })),
+                activity: ann.activity,
+            };
+
+            if (ann.rule) {
+                obj.rule = {
+                    type: FilterType[ann.rule.type],
+                    on: FilterOnType[ann.rule.on],
+                    filter: ann.rule.filter.map((val) => parseEnumByType(FilterOnType[ann.rule.on].toString() as keyof typeof FilterOnType, val.toString()))                    
+                };
+            }
+
+            return obj;
+        }),
+    };
+
+    return raw;
+}
+
 // Helper to map string values to correct enum based on the rule's "on" field
 function parseEnumByType(on: keyof typeof FilterOnType, value: string): number {
     switch (on) {
@@ -272,6 +315,45 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
         }
     };
 
+    const handleAnnotationExport = async (url: string, filename?: string) => {
+        try {
+            if (!filename) {
+                // extract filename from url if one isn't provided
+                try {
+                    filename = new URL(url, document.baseURI).pathname.split('/').pop();
+                } catch (e) {
+                    filename = url;
+                }
+            }
+
+            const lowerFilename = (filename || url).toLowerCase();
+            if (lowerFilename.endsWith('.json')) {
+                try {
+                    const selectedSplat = events.invoke('selection') as Splat
+                    if(selectedSplat)
+                    {
+                        const annotationObj = await saveAnnotationDataToJSON(selectedSplat.annotations);
+                        const annotationJson = JSON.stringify(annotationObj);
+                        console.log("annotation to save: " + annotationJson);
+                        const writer = new DownloadWriter(filename);
+                        writer.write((new TextEncoder()).encode(annotationJson));
+                        writer.close(); // TODO test
+                    }
+                } catch (err) {
+                    console.warn(`No annotation JSON found at ${url}`, err);
+                }
+            } else {
+                throw new Error('Unsupported file type');
+            }
+        } catch (error) {
+            await events.invoke('showPopup', {
+                type: 'error',
+                header: localize('popup.error-loading'),
+                message: `${error.message ?? error} while loading '${filename}'`
+            });
+        }
+    };
+
     events.function('import', (url: string, filename?: string, focusCamera = true, animationFrame = false) => {
         return handleImport(url, filename, focusCamera, animationFrame);
     });
@@ -301,6 +383,7 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
         document.body.append(fileSelector);
     }
 
+    // TODO Fix for chrome
     // create a file selector element as fallback when showOpenFilePicker isn't available
     let annotationFileSelector: HTMLInputElement;
     if (!window.showOpenFilePicker) {
@@ -431,6 +514,10 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
         if (annotationFileSelector) {
             annotationFileSelector.click();
         }
+    });
+
+    events.function('scene.annotationExport', async () => {
+        await handleAnnotationExport("", "splatsAnnotations.json");
     });
 
     // open a folder
