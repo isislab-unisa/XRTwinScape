@@ -1,4 +1,4 @@
-import { Container, Element, Label } from 'pcui';
+import { Container, Element, Label, NumericInput } from 'pcui';
 
 import { Events } from '../events';
 import { localize } from './localization';
@@ -138,7 +138,58 @@ class ScenePanel extends Container {
         const annotationListContainer = new Container({
             class: 'splat-list-container'
         });
-        annotationListContainer.append(annotationList);        
+        annotationListContainer.append(annotationList);  
+        
+        const annotationDetailHeader = new Container({
+            class: 'panel-header'
+        });
+
+        const annotationDetailIcon = new Label({
+            text: '\uE111',
+            class: 'panel-header-icon'
+        });
+
+        const annotationDetailLabel = new Label({
+            text: 'ANNOTATION DETAIL',
+            class: 'panel-header-label'
+        });
+
+        annotationDetailHeader.append(annotationDetailIcon);
+        annotationDetailHeader.append(annotationDetailLabel);
+
+        // position
+        const annotationDetailFirst = new Container({
+            class: 'annotationdetail-row'
+        });
+
+        const annotationDetailIdLabel = new Label({
+            class: 'annotationdetail-idlabel',
+            text: 'ID:'
+        });
+
+        const annotationDetailIdValueLabel = new Label({
+            class: 'annotationdetail-idvaluelabel',
+            text: '999'
+        });
+
+        const annotationDetailActivityLabel = new Label({
+            class: 'annotationdetail-activitylabel',
+            text: 'Activity:'
+        });
+
+        const annotationDetailActivityInput = new NumericInput({
+            class: 'annotationdetail-expand',
+            precision: 0,
+            value: 1,
+            min: 1,
+            max: 99,
+            enabled: true
+        });
+
+        annotationDetailFirst.append(annotationDetailIdLabel);
+        annotationDetailFirst.append(annotationDetailIdValueLabel);
+        annotationDetailFirst.append(annotationDetailActivityLabel);
+        annotationDetailFirst.append(annotationDetailActivityInput);
 
         this.append(sceneHeader);
         this.append(splatListContainer);
@@ -146,6 +197,8 @@ class ScenePanel extends Container {
         this.append(new Transform(events));
         this.append(annotationHeader);
         this.append(annotationListContainer);
+        this.append(annotationDetailHeader);
+        this.append(annotationDetailFirst);
         this.append(new Element({
             class: 'panel-header',
             height: 20
