@@ -8,6 +8,10 @@ enum ExpertiseLevel {Beginner, Intermediate, Expert};
 enum FilterOnType {Emotional, Skill, Expertise};
 enum FilterType {ShowIf, HideIf};
 
+// TODO
+//  add title?
+//  remove rule
+
 class Annotation
 {
     id: number;
@@ -38,15 +42,15 @@ class Annotation
 class AnnotationContent
 {
     content: any;
-    contentType: ContentType;
-    rules: AnnotationRule[] = [];
+    contentType: ContentType; // maybe array
+    rules: AnnotationRule[] = []; // or maybe single value
 }
 
 class AnnotationRule
 {
-    type: FilterType;
+    type: FilterType; // maybe remove, should be always ShowIf
     on: FilterOnType;
-    filter: any[] = []; // array di emotionalState, skillLevel o expertiseLevel
+    filter: any[] = []; // array of emotionalState, skillLevel or expertiseLevel; maybe single value
 }
 
 class AnnotationData
