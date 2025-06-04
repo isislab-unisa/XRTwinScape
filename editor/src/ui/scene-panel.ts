@@ -1,4 +1,4 @@
-import { Container, Element, Label, NumericInput } from 'pcui';
+import { Container, Element, Label, NumericInput, TextAreaInput, TextInput } from 'pcui';
 
 import { Events } from '../events';
 import { localize } from './localization';
@@ -8,6 +8,7 @@ import sceneNewSvg from './svg/new.svg';
 import { Tooltips } from './tooltips';
 import { Transform } from './transform';
 import { AnnotationList } from './annotation-list';
+import { AnnotationDetail } from './annotation-detail';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -15,6 +16,7 @@ const createSvg = (svgString: string) => {
 };
 
 class ScenePanel extends Container {
+
     constructor(events: Events, tooltips: Tooltips, args = {}) {
         args = {
             ...args,
@@ -139,7 +141,7 @@ class ScenePanel extends Container {
             class: 'splat-list-container'
         });
         annotationListContainer.append(annotationList);  
-        
+
         const annotationDetailHeader = new Container({
             class: 'panel-header'
         });
@@ -156,41 +158,7 @@ class ScenePanel extends Container {
 
         annotationDetailHeader.append(annotationDetailIcon);
         annotationDetailHeader.append(annotationDetailLabel);
-
-        // position
-        const annotationDetailFirst = new Container({
-            class: 'annotationdetail-row'
-        });
-
-        const annotationDetailIdLabel = new Label({
-            class: 'annotationdetail-idlabel',
-            text: 'ID:'
-        });
-
-        const annotationDetailIdValueLabel = new Label({
-            class: 'annotationdetail-idvaluelabel',
-            text: '999'
-        });
-
-        const annotationDetailActivityLabel = new Label({
-            class: 'annotationdetail-activitylabel',
-            text: 'Activity:'
-        });
-
-        const annotationDetailActivityInput = new NumericInput({
-            class: 'annotationdetail-expand',
-            precision: 0,
-            value: 1,
-            min: 1,
-            max: 99,
-            enabled: true
-        });
-
-        annotationDetailFirst.append(annotationDetailIdLabel);
-        annotationDetailFirst.append(annotationDetailIdValueLabel);
-        annotationDetailFirst.append(annotationDetailActivityLabel);
-        annotationDetailFirst.append(annotationDetailActivityInput);
-
+        
         this.append(sceneHeader);
         this.append(splatListContainer);
         this.append(transformHeader);
@@ -198,7 +166,7 @@ class ScenePanel extends Container {
         this.append(annotationHeader);
         this.append(annotationListContainer);
         this.append(annotationDetailHeader);
-        this.append(annotationDetailFirst);
+        this.append(new AnnotationDetail(events, tooltips));
         this.append(new Element({
             class: 'panel-header',
             height: 20
