@@ -18,7 +18,7 @@ class Annotation
     position: Vec3;
     defaultContent: AnnotationContent;
     variantContents: AnnotationContent[] = [];
-    rule: AnnotationRule;
+    rule: AnnotationRule; // TODO remove, use the default content one
     activity: number;
 
     constructor(id: number) {

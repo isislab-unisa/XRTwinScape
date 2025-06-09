@@ -4,13 +4,27 @@ import sceneNewSvg from './svg/new.svg';
 import sceneDeleteSvg from './svg/delete.svg';
 import arrowSvg from './svg/arrow.svg';
 import { Tooltips } from './tooltips';
+import { Annotation, AnnotationContent, AnnotationData, ContentType, FilterOnType, FilterType } from 'src/annotation';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
     return new DOMParser().parseFromString(decodedStr, 'image/svg+xml').documentElement;
 };
 
+/*
+    State: current variant index
+    on annotation selected: update current annotation ui, if different from current resent variant index
+    on value change: save on annotation, update current annotation ui
+    on variant change: update current annotation ui
+
+    update current annotation ui todo: change ui values, hide content rows
+       , delete content for hidden content rows, hide arrows, new or delete if disabled
+*/
+
 class AnnotationDetail extends Container {
+    variantIndex: number;
+    annotationToEdit: Annotation;
+
     constructor(events: Events, tooltips: Tooltips, args: ContainerArgs = {}) {
         args = {
             ...args,
@@ -196,8 +210,14 @@ class AnnotationDetail extends Container {
             await events.invoke('annotationDetail.uploadAttachment');
         });
 
+        const annotationDetailUploadFilenameLabel = new Label({
+            class: 'annotationdetail-uploadfilenamelabel',
+            text: 'FILENAME'
+        });
+
         annotationDetailFourthImageAudio.append(annotationDetailUploadLabel);
         annotationDetailFourthImageAudio.append(annotationVariantUploadButton); 
+        annotationDetailFourthImageAudio.append(annotationDetailUploadFilenameLabel);
         
         const annotationDetailFourthLink = new Container({
             class: ['annotationdetail-row', 'annotationdetail-hiddenrow']
@@ -396,6 +416,230 @@ class AnnotationDetail extends Container {
         this.append(annotationDetailSixth);
         this.append(annotationDetailSeventh);
         this.append(annotationDetailEighth);
+
+        const UpdateUI = (annotation: Annotation) =>
+        {
+            // change ui values
+            annotationDetailIdValueLabel.value = annotation.id.toString();
+            annotationDetailActivityInput.value = annotation.activity;
+            let curVariant: AnnotationContent;
+            curVariant = annotation.defaultContent;
+            if(this.variantIndex === 0)
+            {
+                annotationCurrentVariant.value = "Default Content";
+            }
+            else
+            {
+                annotationCurrentVariant.value = "Variant " + this.variantIndex;
+                curVariant = annotation.variantContents[this.variantIndex - 1];
+            }
+
+            const contentButtons = [
+                { button: annotationDetailTextContentButton, type: ContentType.Text },
+                { button: annotationDetailImageContentButton, type: ContentType.Image },
+                { button: annotationDetailAudioContentButton, type: ContentType.Audio },
+                { button: annotationDetailVideoContentButton, type: ContentType.Video }
+            ];
+
+            contentButtons.forEach(({ button, type }) => {
+                button.class.remove('annotationdetail-contentVariant-button');
+                button.class.remove('annotationdetail-contentVariant-selectedbutton');
+                button.class.add(
+                    curVariant.contentType === type 
+                        ? 'annotationdetail-contentVariant-selectedbutton' 
+                        : 'annotationdetail-contentVariant-button'
+                );
+            });
+
+            // TODO update ui from current selected variant
+            if (curVariant.contentType === ContentType.Text) {
+                annotationDetailFourthText.class.remove('annotationdetail-hiddenrow');
+                annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
+                annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
+                textAreaInput.value = curVariant.content || '';
+            } else if (curVariant.contentType === ContentType.Image || 
+                       curVariant.contentType === ContentType.Audio || 
+                       curVariant.contentType === ContentType.Video) {
+                annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
+                annotationDetailFourthImageAudio.class.remove('annotationdetail-hiddenrow');
+                annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
+                annotationDetailUploadFilenameLabel.value = curVariant.content || '';
+            } else {
+                annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
+                annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
+                annotationDetailFourthLink.class.remove('annotationdetail-hiddenrow');
+                linkInput.value = curVariant.content || '';
+            }
+
+            // if a default content is selected, set highlight class for engaged, bored and frustrated button only if on = EmotionalState
+            const filterButtons = [
+                { button: annotationVariantBoredButton, type: 'Bored', on: FilterOnType.Emotional },
+                { button: annotationVariantEngagedButton, type: 'Engaged', on: FilterOnType.Emotional },
+                { button: annotationVariantFrustratedButton, type: 'Frustrated', on: FilterOnType.Emotional },
+                { button: annotationVariantEasyButton, type: 'Easy', on: FilterOnType.Skill },
+                { button: annotationVariantMediumButton, type: 'Medium', on: FilterOnType.Skill },
+                { button: annotationVariantHardButton, type: 'Hard', on: FilterOnType.Skill },
+                { button: annotationVariantBeginnerButton, type: 'Beginner', on: FilterOnType.Expertise },
+                { button: annotationVariantIntermediateButton, type: 'Intermediate', on: FilterOnType.Expertise },
+                { button: annotationVariantExpertButton, type: 'Expert', on: FilterOnType.Expertise }
+            ];
+
+            filterButtons.forEach(({ button }) => button.class.remove('annotationdetail-filterbutton-selected'));
+
+            curVariant.rules.forEach(rule => {
+                filterButtons
+                    .filter(({ type, on }) => rule.on === on && rule.filter.includes(type))
+                    .forEach(({ button }) => button.class.add('annotationdetail-filterbutton-selected'));
+            });                
+        }
+
+        const UpdateAnnotation = (annotation: Annotation) => {
+            annotation.activity = annotationDetailActivityInput.value;
+
+            // Update current variant content
+            let curVariant: AnnotationContent;
+            if (this.variantIndex === 0) 
+            {
+                curVariant = annotation.defaultContent;
+            } 
+            else 
+            {
+                curVariant = annotation.variantContents[this.variantIndex - 1];
+            }
+
+            if (curVariant.contentType === ContentType.Text) 
+            {
+                curVariant.content = textAreaInput.value;
+            } 
+            else if (
+            curVariant.contentType === ContentType.Image ||
+            curVariant.contentType === ContentType.Audio ||
+            curVariant.contentType === ContentType.Video
+            ) 
+            {
+                curVariant.content = annotationDetailUploadFilenameLabel.value;
+            } 
+            else 
+            {
+                curVariant.content = linkInput.value;
+            }
+
+            // Update rules based on selected filters
+            curVariant.rules = [];
+
+            const filterButtons = [
+            { button: annotationVariantBoredButton, type: 'Bored', on: FilterOnType.Emotional },
+            { button: annotationVariantEngagedButton, type: 'Engaged', on: FilterOnType.Emotional },
+            { button: annotationVariantFrustratedButton, type: 'Frustrated', on: FilterOnType.Emotional },
+            { button: annotationVariantEasyButton, type: 'Easy', on: FilterOnType.Skill },
+            { button: annotationVariantMediumButton, type: 'Medium', on: FilterOnType.Skill },
+            { button: annotationVariantHardButton, type: 'Hard', on: FilterOnType.Skill },
+            { button: annotationVariantBeginnerButton, type: 'Beginner', on: FilterOnType.Expertise },
+            { button: annotationVariantIntermediateButton, type: 'Intermediate', on: FilterOnType.Expertise },
+            { button: annotationVariantExpertButton, type: 'Expert', on: FilterOnType.Expertise }
+            ];
+
+            filterButtons.forEach(({ button, type, on }) => 
+            {
+                if (button.class.contains('annotationdetail-filterbutton-selected')) 
+                {
+                    let rule = curVariant.rules.find(r => r.on === on);
+                    if (!rule)                     
+                    {
+                        rule = { type: FilterType.ShowIf, on, filter: [] };
+                        curVariant.rules.push(rule);
+                    }
+                    rule.filter.push(type);
+                }
+            });
+        };
+
+        annotationDetailActivityInput.on('change', () => {
+            this.annotationToEdit.activity = annotationDetailActivityInput.value;
+        });
+
+        events.on('annotationList.selectionChanged', (annotation: Annotation) => {
+            this.variantIndex = 0;
+            this.annotationToEdit = annotation;
+            UpdateUI(annotation);
+        });
+
+        events.on('annotationDetail.currentVariantButtonLeft', () => {
+            if (this.variantIndex > 0) 
+            {
+                this.variantIndex--;
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.currentVariantButtonRight', () => {
+            if (this.variantIndex < this.annotationToEdit.variantContents.length) 
+            {
+                this.variantIndex++;
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.newVariant', () => {
+            const newVariant = new AnnotationContent();
+            newVariant.contentType = ContentType.Text;
+            newVariant.content = '';
+            this.annotationToEdit.variantContents.push(newVariant);            
+            this.variantIndex = this.annotationToEdit.variantContents.length;
+            UpdateUI(this.annotationToEdit);
+        });
+
+        events.on('annotationDetail.deleteVariant', () => {
+            if (this.variantIndex > 0 && this.variantIndex <= this.annotationToEdit.variantContents.length) 
+            {
+                this.annotationToEdit.variantContents.splice(this.variantIndex - 1, 1);
+                if (this.variantIndex > this.annotationToEdit.variantContents.length) 
+                {
+                    this.variantIndex = this.annotationToEdit.variantContents.length;
+                }
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.switchToTextContent', () => {
+            if (this.annotationToEdit) {
+                const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+                currentVariant.contentType = ContentType.Text;
+                currentVariant.content = '';
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.switchToImageContent', () => {
+            if (this.annotationToEdit) {
+                const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+                currentVariant.contentType = ContentType.Image;
+                currentVariant.content = '';
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.switchToAudioContent', () => {
+            if (this.annotationToEdit) {
+                const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+                currentVariant.contentType = ContentType.Audio;
+                currentVariant.content = '';
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        events.on('annotationDetail.switchToVideoContent', () => {
+            if (this.annotationToEdit) {
+                const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+                currentVariant.contentType = ContentType.Video;
+                currentVariant.content = '';
+                UpdateUI(this.annotationToEdit);
+            }
+        });
+
+        // TODO add other events on click and on change from 4th row on
+
+
     }
 }
 

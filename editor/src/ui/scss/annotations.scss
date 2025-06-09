@@ -105,6 +105,22 @@
     }
 }
 
+.annotationdetail-contentVariant-selectedbutton
+{
+    @extend .annotationdetail-contentVariant-button; // Inherit styles from the original class
+    background-color: $bcg-darkest; // Highlight selected button
+    color: $clr-highlighted; // Change text color for selected state    
+}
+
+.annotationdetail-contentVariant-disabledbutton 
+{
+    @extend .annotationdetail-contentVariant-button; // Inherit styles from the original class
+    &:hover {
+      pointer-events: none; // Disable hover effect
+      background-color: inherit; // Optional: Reset hover background color
+    }
+  }
+
 #annotationdetail-flippedButton {
     transform: scaleX(-1);
 }
@@ -126,6 +142,14 @@
 }
 
 .annotationdetail-uploadlabel {
+    width: 80px;
+    flex-shrink: 0;
+    flex-grow: 0;
+    margin: 0px 0px 0px 6px;
+    text-align: left;
+}
+
+.annotationdetail-uploadfilenamelabel {
     width: 80px;
     flex-shrink: 0;
     flex-grow: 0;
@@ -174,6 +198,17 @@
         color: #ff9900;
         background-color: $bcg-darkest;
         cursor: pointer;
+    }
+}
+
+.annotationdetail-filterbutton-selected {
+    @extend .annotationdetail-filterbutton; // Inherit styles from the original class
+    background-color: $bcg-darkest; // Highlight button background
+    color: $clr-highlighted; // Change text color for highlighted state
+
+    &:hover {
+        background-color: $bcg-dark; // Slightly lighter background on hover
+        color: #ff9900; // Keep hover text color consistent
     }
 }
 
