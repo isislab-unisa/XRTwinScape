@@ -68,7 +68,7 @@ class AnnotationList extends Container{
         };
 
         super(args);
-        
+
         const items = new Map<Annotation, AnnotationItem>();
 
         events.on('annotationList.added', (annotation: Annotation) => {
@@ -96,6 +96,7 @@ class AnnotationList extends Container{
         });
 
         events.on('selection.changed', (splat: Splat) => {
+            events.fire('annotationSelection', null);
             for (const [key, value] of items) {
                 events.fire('annotationList.removed', key);
             }
@@ -104,17 +105,20 @@ class AnnotationList extends Container{
             for (const annotation of splat.annotations.annotations)
             {
                 events.fire('annotationList.added', annotation);
-            }
+            }            
         });
 
         this.on('click', (item: AnnotationItem) => {
             for (const [key, value] of items) {
-                if (item === value) {
-                    events.fire('annotationSelection', key);
-                    break;
+            if (item === value) {
+                if (value.selected) {
+                events.fire('annotationSelection', null);
+                } else {
+                events.fire('annotationSelection', key);
                 }
+                break;
             }
-            // TODO
+            }
         });
 
     }

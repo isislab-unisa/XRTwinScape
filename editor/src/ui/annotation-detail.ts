@@ -77,7 +77,7 @@ class AnnotationDetail extends Container {
         annotationVariantButtonLeft.dom.appendChild(createSvg(arrowSvg));
 
         annotationVariantButtonLeft.on('click', async () => {
-            await events.invoke('annotationDetail.currentVariantButtonLeft');
+            await events.fire('annotationDetail.currentVariantButtonLeft');
         });
 
         const annotationCurrentVariant = new Label({
@@ -91,7 +91,7 @@ class AnnotationDetail extends Container {
         annotationVariantButtonRight.dom.appendChild(createSvg(arrowSvg));
 
         annotationVariantButtonRight.on('click', async () => {
-            await events.invoke('annotationDetail.currentVariantButtonRight');
+            await events.fire('annotationDetail.currentVariantButtonRight');
         });
 
         const annotationVariantNew = new Container({
@@ -100,7 +100,7 @@ class AnnotationDetail extends Container {
         annotationVariantNew.dom.appendChild(createSvg(sceneNewSvg));
 
         annotationVariantNew.on('click', async () => {
-            await events.invoke('annotationDetail.newVariant');
+            await events.fire('annotationDetail.newVariant');
         });
 
         const annotationVariantDelete = new Container({
@@ -109,7 +109,7 @@ class AnnotationDetail extends Container {
         annotationVariantDelete.dom.appendChild(createSvg(sceneDeleteSvg));
 
         annotationVariantDelete.on('click', async () => {
-            await events.invoke('annotationDetail.deleteVariant');
+            await events.fire('annotationDetail.deleteVariant');
         });
 
         annotationDetailSecond.append(annotationVariantButtonLeft);
@@ -133,7 +133,7 @@ class AnnotationDetail extends Container {
         annotationDetailTextContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
 
         annotationDetailTextContentButton.on('click', async () => {
-            await events.invoke('annotationDetail.switchToTextContent');
+            await events.fire('annotationDetail.switchToTextContent');
         });
 
         tooltips.register(annotationDetailTextContentButton, 'Text Content', 'top');
@@ -144,7 +144,7 @@ class AnnotationDetail extends Container {
         annotationDetailImageContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
 
         annotationDetailImageContentButton.on('click', async () => {
-            await events.invoke('annotationDetail.switchToImageContent');
+            await events.fire('annotationDetail.switchToImageContent');
         });
 
         tooltips.register(annotationDetailImageContentButton, 'Image Content', 'top');
@@ -155,7 +155,7 @@ class AnnotationDetail extends Container {
         annotationDetailAudioContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
 
         annotationDetailAudioContentButton.on('click', async () => {
-            await events.invoke('annotationDetail.switchToAudioContent');
+            await events.fire('annotationDetail.switchToAudioContent');
         });
 
         tooltips.register(annotationDetailAudioContentButton, 'Audio Content', 'top');
@@ -166,7 +166,7 @@ class AnnotationDetail extends Container {
         annotationDetailVideoContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
 
         annotationDetailVideoContentButton.on('click', async () => {
-            await events.invoke('annotationDetail.switchToVideoContent');
+            await events.fire('annotationDetail.switchToVideoContent');
         });
 
         tooltips.register(annotationDetailVideoContentButton, 'Video Content', 'top');
@@ -367,11 +367,6 @@ class AnnotationDetail extends Container {
 
         annotationVariantBeginnerButton.on('click', async () => {
             await events.invoke('annotationDetail.beginnerFilter');
-            /*this.beginnerSelected = !this.beginnerSelected;
-            if(this.beginnerSelected)
-                annotationVariantBeginnerButton.class.add('annotation-filter-selected');
-            else
-                annotationVariantBeginnerButton.class.remove('annotation-filter-selected');*/
         });
 
         const annotationVariantIntermediateButton = new Container({
@@ -417,116 +412,80 @@ class AnnotationDetail extends Container {
         this.append(annotationDetailSeventh);
         this.append(annotationDetailEighth);
 
-        const UpdateUI = (annotation: Annotation) =>
-        {
-            // change ui values
+        const UpdateUI = (annotation: Annotation) => {
+            // Hide all annotation detail headers and rows if annotation is null
+            const annotationDetailRows = [
+            annotationDetailFirst,
+            annotationDetailSecond,
+            annotationDetailThird,
+            annotationDetailFourthLink,
+            annotationDetailFourthImageAudio,
+            annotationDetailFourthText,
+            annotationDetailFifth,
+            annotationDetailSixth,
+            annotationDetailSeventh,
+            annotationDetailEighth
+            ];
+
+            if (!annotation) {
+            annotationDetailRows.forEach(row => row.class.add('annotationdetail-hiddenrow'));
+            return;
+            }
+
+            annotationDetailRows.forEach(row => row.class.remove('annotationdetail-hiddenrow'));
+
+            // Change UI values
             annotationDetailIdValueLabel.value = annotation.id.toString();
             annotationDetailActivityInput.value = annotation.activity;
             let curVariant: AnnotationContent;
             curVariant = annotation.defaultContent;
-            if(this.variantIndex === 0)
-            {
-                annotationCurrentVariant.value = "Default Content";
-            }
-            else
-            {
-                annotationCurrentVariant.value = "Variant " + this.variantIndex;
-                curVariant = annotation.variantContents[this.variantIndex - 1];
+            if (this.variantIndex === 0) {
+            annotationCurrentVariant.value = "Default Content";
+            } else {
+            annotationCurrentVariant.value = "Variant " + this.variantIndex;
+            curVariant = annotation.variantContents[this.variantIndex - 1];
             }
 
             const contentButtons = [
-                { button: annotationDetailTextContentButton, type: ContentType.Text },
-                { button: annotationDetailImageContentButton, type: ContentType.Image },
-                { button: annotationDetailAudioContentButton, type: ContentType.Audio },
-                { button: annotationDetailVideoContentButton, type: ContentType.Video }
+            { button: annotationDetailTextContentButton, type: ContentType.Text },
+            { button: annotationDetailImageContentButton, type: ContentType.Image },
+            { button: annotationDetailAudioContentButton, type: ContentType.Audio },
+            { button: annotationDetailVideoContentButton, type: ContentType.Video }
             ];
 
             contentButtons.forEach(({ button, type }) => {
-                button.class.remove('annotationdetail-contentVariant-button');
-                button.class.remove('annotationdetail-contentVariant-selectedbutton');
-                button.class.add(
-                    curVariant.contentType === type 
-                        ? 'annotationdetail-contentVariant-selectedbutton' 
-                        : 'annotationdetail-contentVariant-button'
-                );
+            button.class.remove('annotationdetail-contentVariant-button');
+            button.class.remove('annotationdetail-contentVariant-selectedbutton');
+            button.class.add(
+                curVariant.contentType === type
+                ? 'annotationdetail-contentVariant-selectedbutton'
+                : 'annotationdetail-contentVariant-button'
+            );
             });
 
-            // TODO update ui from current selected variant
+            // Update UI from current selected variant
             if (curVariant.contentType === ContentType.Text) {
-                annotationDetailFourthText.class.remove('annotationdetail-hiddenrow');
-                annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
-                annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
-                textAreaInput.value = curVariant.content || '';
-            } else if (curVariant.contentType === ContentType.Image || 
-                       curVariant.contentType === ContentType.Audio || 
-                       curVariant.contentType === ContentType.Video) {
-                annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
-                annotationDetailFourthImageAudio.class.remove('annotationdetail-hiddenrow');
-                annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
-                annotationDetailUploadFilenameLabel.value = curVariant.content || '';
-            } else {
-                annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
-                annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
-                annotationDetailFourthLink.class.remove('annotationdetail-hiddenrow');
-                linkInput.value = curVariant.content || '';
-            }
-
-            // if a default content is selected, set highlight class for engaged, bored and frustrated button only if on = EmotionalState
-            const filterButtons = [
-                { button: annotationVariantBoredButton, type: 'Bored', on: FilterOnType.Emotional },
-                { button: annotationVariantEngagedButton, type: 'Engaged', on: FilterOnType.Emotional },
-                { button: annotationVariantFrustratedButton, type: 'Frustrated', on: FilterOnType.Emotional },
-                { button: annotationVariantEasyButton, type: 'Easy', on: FilterOnType.Skill },
-                { button: annotationVariantMediumButton, type: 'Medium', on: FilterOnType.Skill },
-                { button: annotationVariantHardButton, type: 'Hard', on: FilterOnType.Skill },
-                { button: annotationVariantBeginnerButton, type: 'Beginner', on: FilterOnType.Expertise },
-                { button: annotationVariantIntermediateButton, type: 'Intermediate', on: FilterOnType.Expertise },
-                { button: annotationVariantExpertButton, type: 'Expert', on: FilterOnType.Expertise }
-            ];
-
-            filterButtons.forEach(({ button }) => button.class.remove('annotationdetail-filterbutton-selected'));
-
-            curVariant.rules.forEach(rule => {
-                filterButtons
-                    .filter(({ type, on }) => rule.on === on && rule.filter.includes(type))
-                    .forEach(({ button }) => button.class.add('annotationdetail-filterbutton-selected'));
-            });                
-        }
-
-        const UpdateAnnotation = (annotation: Annotation) => {
-            annotation.activity = annotationDetailActivityInput.value;
-
-            // Update current variant content
-            let curVariant: AnnotationContent;
-            if (this.variantIndex === 0) 
-            {
-                curVariant = annotation.defaultContent;
-            } 
-            else 
-            {
-                curVariant = annotation.variantContents[this.variantIndex - 1];
-            }
-
-            if (curVariant.contentType === ContentType.Text) 
-            {
-                curVariant.content = textAreaInput.value;
-            } 
-            else if (
+            annotationDetailFourthText.class.remove('annotationdetail-hiddenrow');
+            annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
+            annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
+            textAreaInput.value = curVariant.content || '';
+            } else if (
             curVariant.contentType === ContentType.Image ||
             curVariant.contentType === ContentType.Audio ||
             curVariant.contentType === ContentType.Video
-            ) 
-            {
-                curVariant.content = annotationDetailUploadFilenameLabel.value;
-            } 
-            else 
-            {
-                curVariant.content = linkInput.value;
+            ) {
+            annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
+            annotationDetailFourthImageAudio.class.remove('annotationdetail-hiddenrow');
+            annotationDetailFourthLink.class.add('annotationdetail-hiddenrow');
+            annotationDetailUploadFilenameLabel.value = curVariant.content || '';
+            } else {
+            annotationDetailFourthText.class.add('annotationdetail-hiddenrow');
+            annotationDetailFourthImageAudio.class.add('annotationdetail-hiddenrow');
+            annotationDetailFourthLink.class.remove('annotationdetail-hiddenrow');
+            linkInput.value = curVariant.content || '';
             }
 
-            // Update rules based on selected filters
-            curVariant.rules = [];
-
+            // Update filter buttons
             const filterButtons = [
             { button: annotationVariantBoredButton, type: 'Bored', on: FilterOnType.Emotional },
             { button: annotationVariantEngagedButton, type: 'Engaged', on: FilterOnType.Emotional },
@@ -539,20 +498,16 @@ class AnnotationDetail extends Container {
             { button: annotationVariantExpertButton, type: 'Expert', on: FilterOnType.Expertise }
             ];
 
-            filterButtons.forEach(({ button, type, on }) => 
-            {
-                if (button.class.contains('annotationdetail-filterbutton-selected')) 
-                {
-                    let rule = curVariant.rules.find(r => r.on === on);
-                    if (!rule)                     
-                    {
-                        rule = { type: FilterType.ShowIf, on, filter: [] };
-                        curVariant.rules.push(rule);
-                    }
-                    rule.filter.push(type);
-                }
+            filterButtons.forEach(({ button }) => button.class.remove('annotationdetail-filterbutton-selected'));
+
+            curVariant.rules.forEach(rule => {
+            filterButtons
+                .filter(({ type, on }) => rule.on === on && rule.filter.includes(type))
+                .forEach(({ button }) => button.class.add('annotationdetail-filterbutton-selected'));
             });
         };
+
+        UpdateUI(null);
 
         annotationDetailActivityInput.on('change', () => {
             this.annotationToEdit.activity = annotationDetailActivityInput.value;
@@ -637,8 +592,124 @@ class AnnotationDetail extends Container {
             }
         });
 
-        // TODO add other events on click and on change from 4th row on
+        textAreaInput.on('change', (value) => {
+            if (this.annotationToEdit) {
+            const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+            if (currentVariant.contentType === ContentType.Text) {
+                currentVariant.content = value;
+            }
+            }
+        });
 
+        linkInput.on('change', (value) => {
+            if (this.annotationToEdit) {
+            const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+            if (currentVariant.contentType === ContentType.Video) {
+                currentVariant.content = value;
+            }
+            }
+        });
+
+        annotationVariantUploadButton.on('click', async () => {
+            if (!this.annotationToEdit) return;
+
+            const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+
+            // Create a file input element
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+
+            // Set accepted file types based on the current content type
+            if (currentVariant.contentType === ContentType.Image) {
+                fileInput.accept = 'image/*';
+            } else if (currentVariant.contentType === ContentType.Audio) {
+                fileInput.accept = 'audio/*';
+            } else if (currentVariant.contentType === ContentType.Video) {
+                fileInput.accept = 'video/*';                  
+            } else {
+                console.warn('Unsupported content type for file upload');
+                return;
+            }
+
+            // Trigger the file dialog
+            fileInput.click();
+
+            // Handle file selection
+            fileInput.onchange = () => {
+                if (fileInput.files && fileInput.files.length > 0) {
+                    const file = fileInput.files[0];
+                    annotationDetailUploadFilenameLabel.value = file.name;
+                    currentVariant.content = file.name;
+
+                    // Optionally, you can handle file upload logic here
+                    console.log('Selected file:', file);
+                }
+            };
+        });
+
+        const toggleFilter = (button: Container, type: string, on: FilterOnType) => {
+            const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
+
+            let rule = currentVariant.rules.find(r => r.on === on);
+            if (!rule)
+            {
+                rule = { type: FilterType.ShowIf, on, filter: [] };
+                currentVariant.rules.push(rule);
+            }
+
+            if (button.class.contains('annotationdetail-filterbutton-selected')) 
+            {
+                button.class.remove('annotationdetail-filterbutton-selected');
+                rule.filter = rule.filter.filter(f => f !== type);
+            } 
+            else
+            {
+                button.class.add('annotationdetail-filterbutton-selected');
+                rule.filter.push(type);
+            }
+
+            // Remove the rule if no filters are left
+            if (rule.filter.length === 0) 
+            {
+                currentVariant.rules = currentVariant.rules.filter(r => r !== rule);
+            }
+        };
+
+        annotationVariantBoredButton.on('click', () => {
+            toggleFilter(annotationVariantBoredButton, 'Bored', FilterOnType.Emotional);
+        });
+
+        annotationVariantEngagedButton.on('click', () => {
+            toggleFilter(annotationVariantEngagedButton, 'Engaged', FilterOnType.Emotional);
+        });
+
+        annotationVariantFrustratedButton.on('click', () => {
+            toggleFilter(annotationVariantFrustratedButton, 'Frustrated', FilterOnType.Emotional);
+        });
+
+        annotationVariantEasyButton.on('click', () => {
+            toggleFilter(annotationVariantEasyButton, 'Easy', FilterOnType.Skill);
+        });
+
+        annotationVariantMediumButton.on('click', () => {
+            toggleFilter(annotationVariantMediumButton, 'Medium', FilterOnType.Skill);
+        });
+
+        annotationVariantHardButton.on('click', () => {
+            toggleFilter(annotationVariantHardButton, 'Hard', FilterOnType.Skill);
+        });
+
+        annotationVariantBeginnerButton.on('click', () => {
+            toggleFilter(annotationVariantBeginnerButton, 'Beginner', FilterOnType.Expertise);
+        });
+
+        annotationVariantIntermediateButton.on('click', () => {
+            toggleFilter(annotationVariantIntermediateButton, 'Intermediate', FilterOnType.Expertise);
+        });
+
+        annotationVariantExpertButton.on('click', () => {
+            toggleFilter(annotationVariantExpertButton, 'Expert', FilterOnType.Expertise);
+        });
 
     }
 }

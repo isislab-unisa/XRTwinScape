@@ -20,7 +20,7 @@
 }
 
 .annotationdetail-hiddenrow {
-    display: none;
+    display: none !important;
 }
 
 .annotationdetail-idlabel {
@@ -109,7 +109,7 @@
 {
     @extend .annotationdetail-contentVariant-button; // Inherit styles from the original class
     background-color: $bcg-darkest; // Highlight selected button
-    color: $clr-highlighted; // Change text color for selected state    
+    color: $clr-hilight; // Change text color for selected state    
 }
 
 .annotationdetail-contentVariant-disabledbutton 
@@ -204,7 +204,7 @@
 .annotationdetail-filterbutton-selected {
     @extend .annotationdetail-filterbutton; // Inherit styles from the original class
     background-color: $bcg-darkest; // Highlight button background
-    color: $clr-highlighted; // Change text color for highlighted state
+    color: $clr-hilight; // Change text color for highlighted state
 
     &:hover {
         background-color: $bcg-dark; // Slightly lighter background on hover
