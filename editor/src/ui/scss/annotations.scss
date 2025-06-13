@@ -114,12 +114,11 @@
 
 .annotationdetail-contentVariant-disabledbutton 
 {
-    @extend .annotationdetail-contentVariant-button; // Inherit styles from the original class
-    &:hover {
-      pointer-events: none; // Disable hover effect
-      background-color: inherit; // Optional: Reset hover background color
-    }
-  }
+    pointer-events: none; // Disable interaction
+    opacity: 0.5; // Dim the button to indicate it's disabled
+    background-color: $bcg-dark; // Optional: Adjust background color for disabled state
+    cursor: not-allowed; // Change cursor to indicate the button is disabled
+}
 
 #annotationdetail-flippedButton {
     transform: scaleX(-1);

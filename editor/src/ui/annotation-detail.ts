@@ -507,7 +507,31 @@ class AnnotationDetail extends Container {
             });
         };
 
+        const updateVariantButtons = () => {
+            // Disable the left button if at the first variant
+            if (this.variantIndex <= 0) {
+                annotationVariantButtonLeft.class.add('annotationdetail-contentVariant-disabledbutton');
+            } else {
+                annotationVariantButtonLeft.class.remove('annotationdetail-contentVariant-disabledbutton');
+            }
+        
+            // Disable the right button if at the last variant
+            if (!this.annotationToEdit || this.variantIndex >= this.annotationToEdit.variantContents.length) {
+                annotationVariantButtonRight.class.add('annotationdetail-contentVariant-disabledbutton');
+            } else {
+                annotationVariantButtonRight.class.remove('annotationdetail-contentVariant-disabledbutton');
+            }
+        
+            // Disable the delete button if there are no variant contents or if default content is selected
+            if (!this.annotationToEdit || this.variantIndex === 0 || this.annotationToEdit.variantContents.length === 0) {
+                annotationVariantDelete.class.add('annotationdetail-contentVariant-disabledbutton');
+            } else {
+                annotationVariantDelete.class.remove('annotationdetail-contentVariant-disabledbutton');
+            }
+        };
+        
         UpdateUI(null);
+        updateVariantButtons();
 
         annotationDetailActivityInput.on('change', () => {
             this.annotationToEdit.activity = annotationDetailActivityInput.value;
@@ -518,6 +542,7 @@ class AnnotationDetail extends Container {
             this.variantIndex = 0;
             this.annotationToEdit = annotation;
             UpdateUI(annotation);
+            updateVariantButtons();
         });
 
         events.on('annotationDetail.currentVariantButtonLeft', () => {
@@ -525,6 +550,7 @@ class AnnotationDetail extends Container {
             {
                 this.variantIndex--;
                 UpdateUI(this.annotationToEdit);
+                updateVariantButtons();
             }
         });
 
@@ -533,6 +559,7 @@ class AnnotationDetail extends Container {
             {
                 this.variantIndex++;
                 UpdateUI(this.annotationToEdit);
+                updateVariantButtons();
             }
         });
 
@@ -543,6 +570,7 @@ class AnnotationDetail extends Container {
             this.annotationToEdit.variantContents.push(newVariant);            
             this.variantIndex = this.annotationToEdit.variantContents.length;
             UpdateUI(this.annotationToEdit);
+            updateVariantButtons();
         });
 
         events.on('annotationDetail.deleteVariant', () => {
@@ -554,6 +582,7 @@ class AnnotationDetail extends Container {
                     this.variantIndex = this.annotationToEdit.variantContents.length;
                 }
                 UpdateUI(this.annotationToEdit);
+                updateVariantButtons();
             }
         });
 
