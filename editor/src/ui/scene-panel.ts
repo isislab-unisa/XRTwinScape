@@ -9,6 +9,9 @@ import { Tooltips } from './tooltips';
 import { Transform } from './transform';
 import { AnnotationList } from './annotation-list';
 import { AnnotationDetail } from './annotation-detail';
+import { Splat } from 'src/splat';
+import { Annotation, AnnotationContent, ContentType } from 'src/annotation';
+import { Vec3 } from 'playcanvas';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -131,9 +134,51 @@ class ScenePanel extends Container {
 
         tooltips.register(sceneAnnotationExport, 'Export Annotations', 'top');
 
+        // Add button for adding annotations
+        const sceneAnnotationAdd = new Container({
+            class: 'panel-header-button'
+        });
+        sceneAnnotationAdd.dom.appendChild(createSvg(sceneNewSvg)); // Replace `sceneAddSvg` with the appropriate SVG for the add button
+
+        sceneAnnotationAdd.on('click', () => {
+            // Get the selected splat
+            const selectedSplat = events.invoke('selection') as Splat;
+
+            if (!selectedSplat) {
+                console.warn('No splat selected. Please select a splat to add an annotation.');
+                return;
+            }
+
+            // Find the first available ID starting from 1
+            const existingIds = selectedSplat.annotations?.annotations.map(annotation => annotation.id) || [];
+            let newId = 1;
+            while (existingIds.includes(newId)) {
+                newId++;
+            }
+
+            // Create a new annotation with activity 1 and the calculated ID
+            const newAnnotation = new Annotation(newId);
+            newAnnotation.activity = 1;
+            newAnnotation.position = Vec3.ZERO.clone();
+
+            // Add the annotation to the selected splat
+            selectedSplat.annotations.annotations.push(newAnnotation);
+            // Add a default variant with empty text
+            const newContent = new AnnotationContent();
+            newContent.content = '';
+            newContent.contentType = ContentType.Text;
+            newAnnotation.defaultContent = newContent
+
+            // Fire the event to update the annotation list
+            events.fire('annotationList.added', newAnnotation);
+        });
+
+        tooltips.register(sceneAnnotationAdd, 'Add Annotation', 'top');
+
         annotationHeader.append(annotationIcon);
         annotationHeader.append(annotationLabel);
         annotationHeader.append(sceneAnnotationExport);
+        annotationHeader.append(sceneAnnotationAdd); // Append the add button after the export button
 
         const annotationList = new AnnotationList(events);
 
