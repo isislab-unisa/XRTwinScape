@@ -265,4 +265,4 @@ class SplatList extends Container {
     }
 }
 
-export { SplatList, SplatItem };
+export { SplatList, SplatItem, createSvg };

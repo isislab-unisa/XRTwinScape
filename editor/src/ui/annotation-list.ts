@@ -2,6 +2,8 @@ import { Container, Label, Element as PcuiElement } from "pcui";
 import { Events } from "../events";
 import { Annotation } from "../annotation";
 import { Splat } from "../splat";
+import { createSvg } from "./splat-list";
+import deleteSvg from './svg/delete.svg';
 
 // TODO add select and delete
 
@@ -10,6 +12,7 @@ class AnnotationItem extends Container
     getName: () => string;
     getSelected: () => boolean;
     setSelected: (value: boolean) => void;
+    destroy: () => void;
 
     constructor(id: number, args = {}) {
         args = {
@@ -24,7 +27,13 @@ class AnnotationItem extends Container
             text: id.toString()
         });
 
+        const deleteButton = new PcuiElement({
+            dom: createSvg(deleteSvg),
+            class: 'splat-item-delete'
+        });
+
         this.append(text);
+        this.append(deleteButton);
 
         this.getName = () => {
             return text.value;
@@ -45,6 +54,17 @@ class AnnotationItem extends Container
                 }
             }
         };
+
+        const handleRemove = (event: MouseEvent) => {
+            event.stopPropagation();
+            this.emit('removeClicked', this);
+        };
+
+        deleteButton.dom.addEventListener('click', handleRemove);
+
+        this.destroy = () => {
+            deleteButton.dom.removeEventListener('click', handleRemove);
+        };
     }
 
     get name() {
@@ -60,7 +80,8 @@ class AnnotationItem extends Container
     }
 }
 
-class AnnotationList extends Container{
+class AnnotationList extends Container 
+{
     constructor(events: Events, args = {}) {
         args = {
             ...args,
@@ -76,7 +97,30 @@ class AnnotationList extends Container{
             this.append(item);
             items.set(annotation, item);
 
-            // TODO
+            // Handle delete event for the item
+            item.on('removeClicked', async () => {
+                const result = await events.invoke('showPopup', {
+                    type: 'yesno',
+                    header: 'Remove Annotation',
+                    message: `Are you sure you want to remove annotation with ID '${annotation.id}'? This operation cannot be undone.`
+                });
+
+                if (result?.action === 'yes') {
+                    const selectedSplat = events.invoke('selection') as Splat;
+
+                    if (!selectedSplat) {
+                        console.warn('No splat selected. Please select a splat to add an annotation.');
+                        return;
+                    }
+                    // Remove the annotation from the splat
+                    const index = selectedSplat.annotations.annotations.indexOf(annotation);
+                    if (index !== -1) {
+                        selectedSplat.annotations.annotations.splice(index, 1);
+                    }
+
+                    events.fire('annotationList.removed', annotation);
+                }
+            });
         });
 
         events.on('annotationList.removed', (annotation: Annotation) => {
@@ -85,14 +129,12 @@ class AnnotationList extends Container{
                 this.remove(item);
                 items.delete(annotation);
             }
-            // TODO
         });
 
         events.on('annotationList.selectionChanged', (annotation: Annotation) => {
             items.forEach((value, key) => {
                 value.selected = key === annotation;
             });
-            // TODO
         });
 
         events.on('selection.changed', (splat: Splat) => {
@@ -110,14 +152,14 @@ class AnnotationList extends Container{
 
         this.on('click', (item: AnnotationItem) => {
             for (const [key, value] of items) {
-            if (item === value) {
-                if (value.selected) {
-                events.fire('annotationSelection', null);
-                } else {
-                events.fire('annotationSelection', key);
+                if (item === value) {
+                    if (value.selected) {
+                    events.fire('annotationSelection', null);
+                    } else {
+                    events.fire('annotationSelection', key);
+                    }
+                    break;
                 }
-                break;
-            }
             }
         });
 
@@ -131,12 +173,16 @@ class AnnotationList extends Container{
                 this.emit('click', element);
             });
 
+            element.on('removeClicked', () => {
+                this.emit('removeClicked', element);
+            });
         }
     }
 
     protected _onRemoveChild(element: PcuiElement): void {
         if (element instanceof AnnotationItem) {
             element.unbind('click');
+            element.unbind('removeClicked');
         }
 
         super._onRemoveChild(element);
