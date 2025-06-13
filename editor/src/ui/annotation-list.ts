@@ -5,16 +5,15 @@ import { Splat } from "../splat";
 import { createSvg } from "./splat-list";
 import deleteSvg from './svg/delete.svg';
 
-// TODO add select and delete
-
 class AnnotationItem extends Container
 {
+    private activityLabel: Label;
     getName: () => string;
     getSelected: () => boolean;
     setSelected: (value: boolean) => void;
     destroy: () => void;
 
-    constructor(id: number, args = {}) {
+    constructor(id: number, activity: number, args = {}) {
         args = {
             ...args,
             class: ['splat-item', 'visible']
@@ -27,12 +26,18 @@ class AnnotationItem extends Container
             text: id.toString()
         });
 
+        this.activityLabel = new Label({
+            class: 'splat-item-activity',
+            text: activity.toString()
+        });
+
         const deleteButton = new PcuiElement({
             dom: createSvg(deleteSvg),
             class: 'splat-item-delete'
         });
 
         this.append(text);
+        this.append(this.activityLabel);
         this.append(deleteButton);
 
         this.getName = () => {
@@ -67,6 +72,10 @@ class AnnotationItem extends Container
         };
     }
 
+    updateActivity(activity: number) {
+        this.activityLabel.text = activity.toString();
+    }
+
     get name() {
         return this.getName();
     }
@@ -93,7 +102,7 @@ class AnnotationList extends Container
         const items = new Map<Annotation, AnnotationItem>();
 
         events.on('annotationList.added', (annotation: Annotation) => {
-            const item = new AnnotationItem(annotation.id);
+            const item = new AnnotationItem(annotation.id, annotation.activity);
             this.append(item);
             items.set(annotation, item);
 
@@ -150,6 +159,14 @@ class AnnotationList extends Container
             }            
         });
 
+        events.on('annotationDetail.activityChanged', (annotation: Annotation) => {
+            const item = items.get(annotation);
+            if (item) {
+                item.updateActivity(annotation.activity);
+            }
+        });
+
+
         this.on('click', (item: AnnotationItem) => {
             for (const [key, value] of items) {
                 if (item === value) {
@@ -162,7 +179,6 @@ class AnnotationList extends Container
                 }
             }
         });
-
     }
 
     protected _onAppendChild(element: PcuiElement): void {

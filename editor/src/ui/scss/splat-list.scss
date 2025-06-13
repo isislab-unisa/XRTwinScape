@@ -19,6 +19,16 @@
     }
 }
 
+.splat-item-delete {
+    flex-shrink: 0;
+    cursor: pointer;
+    color: red;
+
+    &:hover {
+        color: darkred;
+    }
+}
+
 .splat-item-text {
     flex-grow: 1;
     flex-shrink: 1;
@@ -32,6 +42,13 @@
     .selected & {
         color: $text-primary;
     }
+}
+
+.splat-item-activity {
+    flex-shrink: 0;
+    text-align: right;
+    margin-right: 8px;
+    color: #888; // Optional: Add a subtle color for the activity label
 }
 
 .splat-item-visible {
