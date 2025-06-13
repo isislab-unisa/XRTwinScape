@@ -511,6 +511,7 @@ class AnnotationDetail extends Container {
 
         annotationDetailActivityInput.on('change', () => {
             this.annotationToEdit.activity = annotationDetailActivityInput.value;
+            events.fire('annotationDetail.activityChanged', this.annotationToEdit);
         });
 
         events.on('annotationList.selectionChanged', (annotation: Annotation) => {
