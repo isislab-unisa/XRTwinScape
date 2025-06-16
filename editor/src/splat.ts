@@ -26,7 +26,7 @@ import { vertexShader, fragmentShader, gsplatCenter } from './shaders/splat-shad
 import { State } from './splat-state';
 import { Transform } from './transform';
 import { TransformPalette } from './transform-palette';
-import { AnnotationData, Annotation, ContentType, FilterOnType, FilterType, ExpertiseLevel, EmotionalState } from './annotation';
+import { AnnotationData, Annotation, ContentType, FilterOnType, ExpertiseLevel, EmotionalState } from './annotation';
 
 const vec = new Vec3();
 const veca = new Vec3();
@@ -226,7 +226,6 @@ class Splat extends Element {
                 contentType: ContentType.Text,
                 rules: [
                     {
-                        type: FilterType.ShowIf,
                         on: FilterOnType.Expertise,
                         filter: [ExpertiseLevel.Expert]
                     }
@@ -242,11 +241,6 @@ class Splat extends Element {
             content: "You're doing great. Keep going!",
             contentType: ContentType.Audio,
             rules: []
-        };
-        annotation3.rule = {
-            type: FilterType.ShowIf,
-            on: FilterOnType.Emotional,
-            filter: [EmotionalState.Frustrated]
         };
         annotation3.activity = 3;
 

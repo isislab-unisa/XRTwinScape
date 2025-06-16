@@ -4,7 +4,7 @@ import sceneNewSvg from './svg/new.svg';
 import sceneDeleteSvg from './svg/delete.svg';
 import arrowSvg from './svg/arrow.svg';
 import { Tooltips } from './tooltips';
-import { Annotation, AnnotationContent, AnnotationData, ContentType, FilterOnType, FilterType } from 'src/annotation';
+import { Annotation, AnnotationContent, AnnotationData, ContentType, FilterOnType} from 'src/annotation';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -683,7 +683,7 @@ class AnnotationDetail extends Container {
             let rule = currentVariant.rules.find(r => r.on === on);
             if (!rule)
             {
-                rule = { type: FilterType.ShowIf, on, filter: [] };
+                rule = { on, filter: [] };
                 currentVariant.rules.push(rule);
             }
 
