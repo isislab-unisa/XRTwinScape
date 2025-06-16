@@ -6,7 +6,6 @@ enum EmotionalState {Bored, Engaged, Frustrated};
 enum SkillLevel {Easy, Medium, Hard};
 enum ExpertiseLevel {Beginner, Intermediate, Expert};
 enum FilterOnType {Emotional, Skill, Expertise};
-enum FilterType {ShowIf, HideIf};
 
 // TODO
 //  add title?
@@ -18,7 +17,6 @@ class Annotation
     position: Vec3;
     defaultContent: AnnotationContent;
     variantContents: AnnotationContent[] = [];
-    rule: AnnotationRule; // TODO remove, use the default content one
     activity: number;
 
     constructor(id: number) {
@@ -48,7 +46,6 @@ class AnnotationContent
 
 class AnnotationRule
 {
-    type: FilterType; // maybe remove, should be always ShowIf
     on: FilterOnType;
     filter: any[] = []; // array of emotionalState, skillLevel or expertiseLevel; maybe single value
 }
@@ -60,4 +57,4 @@ class AnnotationData
 }
 
 
-export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType, FilterType}
+export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}

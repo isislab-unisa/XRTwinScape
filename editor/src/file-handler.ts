@@ -8,7 +8,7 @@ import { Writer, DownloadWriter, FileStreamWriter } from './serialize/writer';
 import { Splat } from './splat';
 import { serializePly, serializePlyCompressed, SerializeSettings, serializeSplat, serializeViewer, ViewerExportSettings } from './splat-serialize';
 import { localize } from './ui/localization';
-import { Annotation, AnnotationContent, AnnotationData, ContentType, EmotionalState, ExpertiseLevel, FilterOnType, FilterType, SkillLevel } from './annotation';
+import { Annotation, AnnotationContent, AnnotationData, ContentType, EmotionalState, ExpertiseLevel, FilterOnType, SkillLevel } from './annotation';
 import "reflect-metadata";
 
 // ts compiler and vscode find this type, but eslint does not
@@ -145,7 +145,6 @@ async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
         annotation.defaultContent.contentType = ContentType[ann.defaultContent.contentType as keyof typeof ContentType];
         annotation.defaultContent.rules = (ann.defaultContent.rules || []).map((rule: any) => {
             return {
-                type: FilterType[rule.type as keyof typeof FilterType],
                 on: FilterOnType[rule.on as keyof typeof FilterOnType],
                 filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
             };
@@ -157,21 +156,12 @@ async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
             content.contentType = ContentType[vc.contentType as keyof typeof ContentType];
             content.rules = (vc.rules || []).map((rule: any) => {
                 return {
-                    type: FilterType[rule.type as keyof typeof FilterType],
                     on: FilterOnType[rule.on as keyof typeof FilterOnType],
                     filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
                 };
             });
             return content;
         });
-
-        if (ann.rule) {
-            annotation.rule = {
-                type: FilterType[ann.rule.type as keyof typeof FilterType],
-                on: FilterOnType[ann.rule.on as keyof typeof FilterOnType],
-                filter: ann.rule.filter.map((val: string) => parseEnumByType(ann.rule.on, val))
-            };
-        }
 
         annotation.activity = ann.activity;
         data.annotations.push(annotation);
@@ -191,7 +181,6 @@ async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
                     content: ann.defaultContent.content,
                     contentType: ContentType[ann.defaultContent.contentType],
                     rules: ann.defaultContent.rules.map((rule) => ({
-                        type: FilterType[rule.type],
                         on: FilterOnType[rule.on],
                         filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
                     })),
@@ -200,21 +189,12 @@ async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
                     content: vc.content,
                     contentType: ContentType[vc.contentType],
                     rules: vc.rules.map((rule) => ({
-                        type: FilterType[rule.type],
                         on: FilterOnType[rule.on],
                         filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
                     })),
                 })),
                 activity: ann.activity,
             };
-
-            if (ann.rule) {
-                obj.rule = {
-                    type: FilterType[ann.rule.type],
-                    on: FilterOnType[ann.rule.on],
-                    filter: ann.rule.filter.map((val) => parseEnumByType(FilterOnType[ann.rule.on].toString() as keyof typeof FilterOnType, val.toString()))                    
-                };
-            }
 
             return obj;
         }),
