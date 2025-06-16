@@ -74,6 +74,10 @@ def render_xrts_viewer(request):
     return render(request, 'viewer/xrts-viewer.html', context={'resource': request.POST.get('resource'),
                                                                'title': request.POST.get('title'),
                                                                'annotation': request.POST.get('annotation')})
+# @login_required
+# @require_http_methods(['GET'])
+# def render_annotator(request):
+#     return redirect(f"http://localhost:3000/?code=xxxx")
 
 @login_required
 @require_http_methods(['POST'])
