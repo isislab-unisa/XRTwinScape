@@ -389,6 +389,7 @@
             console.log("annotation: ",annotation)
         </script>
         <script type="module">
+
 			var  camera, annotations;
             // "http://localhost/static/viewer/conf.json"
 			fetch(`/pick_annotation_from_minio/${annotation}`)
@@ -399,7 +400,7 @@
 					const url = new URL(location.href);
 					// const resource = "pcpc_2_pcpc.ply"
                     
-                    console.log(resource)
+                    // console.log(resource)
 					window.sse = {
 							settings: {"camera":{"fov":50,"position":camera.position,
 							"target":camera.target,"startAnim":"none","animTrack":null},
@@ -413,8 +414,8 @@
 							annotations.forEach(annotation => {
 									// Create the <pc-entity> element
 									const pcEntity = document.createElement('pc-entity');
-									pcEntity.setAttribute('name', annotation.name);
-									pcEntity.setAttribute('position', annotation.position.join(' '));
+									pcEntity.setAttribute('name', annotation.id);
+									pcEntity.setAttribute('position', [annotation.position.x, annotation.position.y, annotation.position.z].join(' '));
 
 									// Create the <pc-scripts> element
 									const pcScripts = document.createElement('pc-scripts');
@@ -425,9 +426,7 @@
 
 									// Set the attributes for the script (title, text, camera position)
 									const scriptAttributes = {
-									"title": annotation.title,
-									"text": annotation.text,
-									"cameraPos": annotation.cameraPos
+                                        annotationData : annotation
 									};
 									pcScript.setAttribute('attributes', JSON.stringify(scriptAttributes));
 
@@ -475,15 +474,6 @@
                 <pc-entity name="light" rotation="35 45 0">
                     <pc-light color="white" intensity="1.5"></pc-light>
                 </pc-entity>
-				<!--<pc-entity name="annotation1" position="-0.0686940997838974 -1.441078782081604 0.8341890573501587">
-                    <pc-scripts>
-                        <pc-script name="annotation" attributes='{
-                            "title": "Repainting Scaffold",
-                            "text": "<p>This scaffolding is part of ongoing (as of December 2024) work to <a href=\"https://static1.squarespace.com/static/5e6fff374bb4d0147cd19d8a/t/679aab99901a1056521ccae8/1738189722180/Notice+of+Community+Meeting+for+the+Exterior+Horizontal+Cladding+Replacement+Project+%284915-8987-4957.4%29.pdf\">remove and repaint</a> the old lead paint on the towers exterior.</p><p>Sutro tower is equipped with a built-in water line, enabling workers to use high pressure water to blast off the old paint. The scaffolding serves to prevent the lead from escaping into the air.</p>",
-                            "cameraPos": [0,0,0]
-                        }'></pc-script>
-                    </pc-scripts>
-                </pc-entity>-->
 
                 <!-- Splat -->
                 <pc-entity name="splat" rotation="0 0 180">
