@@ -26,10 +26,26 @@ class AnnotationItem extends Container
             text: id.toString()
         });
 
+        // Create a container for the activity label
+        const activityContainer = new Container({
+            class: 'annotationitem-activity-container'
+        });
+
+        // Add the "activity:" label
+        const activityPrefix = new Label({
+            class: 'annotationitem-activity-prefix',
+            text: 'activity:'
+        });
+
+        // Add the activity number label
         this.activityLabel = new Label({
-            class: 'splat-item-activity',
+            class: 'annotationitem-activity',
             text: activity.toString()
         });
+
+        // Append the prefix and activity number to the container
+        activityContainer.append(activityPrefix);
+        activityContainer.append(this.activityLabel);
 
         const deleteButton = new PcuiElement({
             dom: createSvg(deleteSvg),
@@ -37,7 +53,7 @@ class AnnotationItem extends Container
         });
 
         this.append(text);
-        this.append(this.activityLabel);
+        this.append(activityContainer); // Append the activity container
         this.append(deleteButton);
 
         this.getName = () => {

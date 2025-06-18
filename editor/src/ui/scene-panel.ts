@@ -5,6 +5,7 @@ import { localize } from './localization';
 import { SplatList } from './splat-list';
 import sceneImportSvg from './svg/import.svg';
 import sceneNewSvg from './svg/new.svg';
+import annotationNewSvg from './svg/new annotation.svg';
 import { Tooltips } from './tooltips';
 import { Transform } from './transform';
 import { AnnotationList } from './annotation-list';
@@ -138,7 +139,7 @@ class ScenePanel extends Container {
         const sceneAnnotationAdd = new Container({
             class: 'panel-header-button'
         });
-        sceneAnnotationAdd.dom.appendChild(createSvg(sceneNewSvg)); // Replace `sceneAddSvg` with the appropriate SVG for the add button
+        sceneAnnotationAdd.dom.appendChild(createSvg(annotationNewSvg));
 
         sceneAnnotationAdd.on('click', () => {
             // Get the selected splat

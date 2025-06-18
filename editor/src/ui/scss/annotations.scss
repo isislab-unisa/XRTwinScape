@@ -124,6 +124,10 @@
     transform: scaleX(-1);
 }
 
+#annotationdetail-arrowUp {
+    transform: rotate(270deg);
+}
+
 .annotationdetail-currentvariantlabel {
     width: 120px;
     flex-shrink: 0;
@@ -221,4 +225,20 @@
 
 .annotation-filter-selected {
     background-color: $bcg-dark;
+}
+
+.annotationitem-activity-container {
+    display: flex;
+    align-items: center;
+    gap: 4px; /* Add some spacing between the prefix and the number */
+}
+
+.annotationitem-activity-prefix {
+    font-size: 10px;
+    color: #888;
+}
+
+.annotationitem-activity {
+    font-size: 12px;
+    font-weight: bold;
 }
