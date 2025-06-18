@@ -15,8 +15,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const entityElement = await document.querySelector('pc-entity[name="camera"]').ready();
     const entity = entityElement.entity;
-    
-    
+        
 
     class FrameScene extends Script {
         resetCamera(bbox) {
