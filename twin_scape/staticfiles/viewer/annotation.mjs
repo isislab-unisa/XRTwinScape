@@ -13,6 +13,7 @@ import {
     StandardMaterial,
     Texture
 } from  "http://localhost/static/viewer/util.js";
+import { ContentType } from "./annotation.js";
 
 
 
@@ -128,6 +129,10 @@ export class Annotation extends Script {
 
     /** @type {HTMLStyleElement | null} */
     static _styleSheet = null;
+
+    static attributes = {
+        annotationData: { type: 'object' }
+    };
 
     /**
      * Injects required CSS styles into the document
@@ -292,6 +297,7 @@ export class Annotation extends Script {
         return material;
     }
 
+
     initialize() {
       
         // Ensure styles are injected
@@ -304,12 +310,32 @@ export class Annotation extends Script {
         // Add title
         const titleElement = document.createElement('div');
         titleElement.className = 'pc-annotation-title';
-        titleElement.textContent = this.title;
+        titleElement.textContent = this.annotationData.id;
         this._tooltip.appendChild(titleElement);
 
         // Add text
         const textElement = document.createElement('div');
-        textElement.innerHTML = this.text;
+        var contentType = this.annotationData.defaultContent.contentType;
+        var content = this.annotationData.defaultContent.content;
+        var innerHTML = '';
+        switch (contentType) {
+            case "Text":
+                innerHTML = `<p>${content}</p>`;
+                break;
+            case "Image":
+                innerHTML = `<img src="${content}" alt="Annotation Image" style="max-width: 300px; max-height: 300px;">`;
+                break;
+            case "Video":
+                innerHTML = `<video src="${content}" controls autoplay muted width="320" height="240"></video>`;
+                break;
+            case "Audio":
+                // innerHTML = `<audio controls><source src="${content}" type="audio/mpeg">Non supported</audio>`;
+                innerHTML = `<video src="${content}" controls autoplay width="320" height="40"></video>`;
+                break;
+            default:
+                break;
+        }
+        textElement.innerHTML = innerHTML;
         this._tooltip.appendChild(textElement);
 
         // Create hotspot element
@@ -433,7 +459,9 @@ export class Annotation extends Script {
                 Annotation._activeTooltip = null;
             }
         });
+
     }
+
 
     /**
      * @private
@@ -474,6 +502,8 @@ export class Annotation extends Script {
         this._updatePositions(screenPos);
         this._updateRotationAndScale();
         // this._pulseAnnotations(dt);
+
+
 
     }
 
