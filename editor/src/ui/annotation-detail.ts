@@ -1,8 +1,12 @@
 import { Container, ContainerArgs, Label, NumericInput, TextAreaInput, TextInput} from 'pcui';
 import { Events } from '../events';
-import sceneNewSvg from './svg/new.svg';
 import sceneDeleteSvg from './svg/delete.svg';
 import arrowSvg from './svg/arrow.svg';
+import annotationNewSvg from './svg/new annotation.svg';
+import textVariantSvg from './svg/text variant.svg';
+import imageVariantSvg from './svg/image variant.svg';
+import audioVariantSvg from './svg/audio variant.svg';
+import videoVariantSvg from './svg/video variant.svg';
 import { Tooltips } from './tooltips';
 import { Annotation, AnnotationContent, AnnotationData, ContentType, FilterOnType} from 'src/annotation';
 
@@ -97,7 +101,7 @@ class AnnotationDetail extends Container {
         const annotationVariantNew = new Container({
             class: 'annotationdetail-contentVariant-button'
         });
-        annotationVariantNew.dom.appendChild(createSvg(sceneNewSvg));
+        annotationVariantNew.dom.appendChild(createSvg(annotationNewSvg));
 
         annotationVariantNew.on('click', async () => {
             await events.fire('annotationDetail.newVariant');
@@ -130,7 +134,7 @@ class AnnotationDetail extends Container {
         const annotationDetailTextContentButton = new Container({
             class: 'annotationdetail-contentVariant-button'
         });
-        annotationDetailTextContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
+        annotationDetailTextContentButton.dom.appendChild(createSvg(textVariantSvg));
 
         annotationDetailTextContentButton.on('click', async () => {
             await events.fire('annotationDetail.switchToTextContent');
@@ -141,7 +145,7 @@ class AnnotationDetail extends Container {
         const annotationDetailImageContentButton = new Container({
             class: 'annotationdetail-contentVariant-button'
         });
-        annotationDetailImageContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
+        annotationDetailImageContentButton.dom.appendChild(createSvg(imageVariantSvg));
 
         annotationDetailImageContentButton.on('click', async () => {
             await events.fire('annotationDetail.switchToImageContent');
@@ -152,7 +156,7 @@ class AnnotationDetail extends Container {
         const annotationDetailAudioContentButton = new Container({
             class: 'annotationdetail-contentVariant-button'
         });
-        annotationDetailAudioContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
+        annotationDetailAudioContentButton.dom.appendChild(createSvg(audioVariantSvg));
 
         annotationDetailAudioContentButton.on('click', async () => {
             await events.fire('annotationDetail.switchToAudioContent');
@@ -163,7 +167,7 @@ class AnnotationDetail extends Container {
         const annotationDetailVideoContentButton = new Container({
             class: 'annotationdetail-contentVariant-button'
         });
-        annotationDetailVideoContentButton.dom.appendChild(createSvg(sceneDeleteSvg));
+        annotationDetailVideoContentButton.dom.appendChild(createSvg(videoVariantSvg));
 
         annotationDetailVideoContentButton.on('click', async () => {
             await events.fire('annotationDetail.switchToVideoContent');
@@ -202,9 +206,10 @@ class AnnotationDetail extends Container {
         });
 
         const annotationVariantUploadButton = new Container({
-            class: 'annotationdetail-contentVariant-button'
+            class: 'annotationdetail-arrow-button',
+            id: 'annotationdetail-arrowUp'
         });
-        annotationVariantUploadButton.dom.appendChild(createSvg(sceneNewSvg));
+        annotationVariantUploadButton.dom.appendChild(createSvg(arrowSvg));
 
         annotationVariantUploadButton.on('click', async () => {
             await events.invoke('annotationDetail.uploadAttachment');

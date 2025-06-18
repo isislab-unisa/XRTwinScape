@@ -7,10 +7,6 @@ enum SkillLevel {Easy, Medium, Hard};
 enum ExpertiseLevel {Beginner, Intermediate, Expert};
 enum FilterOnType {Emotional, Skill, Expertise};
 
-// TODO
-//  add title?
-//  remove rule
-
 class Annotation
 {
     id: number;
@@ -55,6 +51,5 @@ class AnnotationData
     annotations: Annotation[] = [];
     splat: string;
 }
-
 
 export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}
