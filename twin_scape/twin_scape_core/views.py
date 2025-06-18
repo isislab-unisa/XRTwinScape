@@ -18,7 +18,8 @@ import mimetypes
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+import json
+from django.core.files.base import ContentFile
 
 # Redis client
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
@@ -109,6 +110,11 @@ def complete_build(request):
         if status == "COMPLETED":
             lesson.ref_ply = ply_path
             lesson.status = "BUILT"
+            lesson.ref_annotations = f"{lesson.title}_{lesson.pk}/splat.json"
+            minio_storage = MinioStorage()
+            data = {"splat": "splat.ply", "annotations": []}
+            json_data = json.dumps(data)
+            minio_storage.put(f"{lesson.title}_{lesson.pk}/splat.json", json_data, content_type="application/json")
         else:
             lesson.status = "FAILED"
 
@@ -161,3 +167,49 @@ def get_images(request, id):
     except Exception as e:
         print(f"[ERROR] Exception in get_images: {str(e)}")
         return JsonResponse({"error": "Errore durante il recupero dell'immagine."}, status=500)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_data_from_minio(request):
+    storage = MinioStorage()
+    resource = request.GET.get('resource')
+
+    if not resource:
+        return JsonResponse({"error": f"Missing folder or resource name {resource}"}, status=400)
+
+    if not storage.exists(resource):
+        return JsonResponse({"error": "File not found"}, status=404)
+
+    file_obj = storage.open(resource, mode='rb')
+
+    return FileResponse(file_obj, as_attachment=True, filename=resource)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_data_on_minio(request):
+    storage = MinioStorage()
+    resource = request.data.get('resource')
+
+    if not resource:
+        return JsonResponse({"error": "Missing folder or resource name"}, status=400)
+
+    if not storage.exists(resource):
+        return JsonResponse({"error": "File not found"}, status=404)
+
+    storage.delete(resource)
+
+    return JsonResponse({"message": "File deleted successfully"}, status=200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_data_on_minio(request):
+    storage = MinioStorage()
+    resource = request.POST.get('resource')
+    uploaded_file = request.FILES.get('file')
+
+    if not resource or not uploaded_file:
+        return JsonResponse({"error": "Missing 'resource' or file"}, status=400)
+
+    storage.save(resource, uploaded_file)
+
+    return JsonResponse({"message": "File uploaded successfully"}, status=200)

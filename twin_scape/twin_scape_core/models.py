@@ -48,7 +48,7 @@ class Lesson(models.Model):
     description = models.TextField(null=True, blank=True)
     creation_time = models.DateTimeField(auto_now_add=True)
     images = models.ImageField(upload_to="", storage=MinioStorage(), null=True, blank=True)
-    video_file = models.FileField(upload_to="", storage=MinioStorage(), null=True, blank=True)
+    video_file = models.FileField(upload_to="", storage=MinioStorage(), null=False, blank=False)
     tag = models.ManyToManyField('Tag')
     user = models.ForeignKey(get_user_model(), on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(
