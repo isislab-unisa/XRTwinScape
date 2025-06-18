@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import pick_data_from_minio, render_xrts_viewer, build, pick_annotation_from_minio, complete_build, get_images
+from .views import pick_data_from_minio, render_xrts_viewer, build, pick_annotation_from_minio, complete_build, get_images, get_data_from_minio, delete_data_on_minio, upload_data_on_minio
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
@@ -11,4 +11,7 @@ urlpatterns = [
     path('get_images/<int:id>/', get_images, name='get_images'),
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('get_data_from_minio/', get_data_from_minio, name='get_data_from_minio'),
+    path('delete_data_on_minio/', delete_data_on_minio, name='delete_data_on_minio'),
+    path('upload_data_on_minio/', upload_data_on_minio, name='upload_data_on_minio'),
 ]
