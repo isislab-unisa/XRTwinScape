@@ -34,6 +34,11 @@ class SplatItem extends Container {
             text: name
         });
 
+        this.append(text);
+
+        // Disabled to edit only one splat at a time
+        /*
+
         const visible = new PcuiElement({
             dom: createSvg(shownSvg),
             class: 'splat-item-visible'
@@ -49,11 +54,13 @@ class SplatItem extends Container {
             dom: createSvg(deleteSvg),
             class: 'splat-item-delete'
         });
+        */
 
-        this.append(text);
+        
+        /*
         this.append(visible);
         this.append(invisible);
-        this.append(remove);
+        this.append(remove);*/
 
         this.getName = () => {
             return text.value;
@@ -79,6 +86,7 @@ class SplatItem extends Container {
             }
         };
 
+        /*
         this.getVisible = () => {
             return this.class.contains('visible');
         };
@@ -107,6 +115,7 @@ class SplatItem extends Container {
             this.emit('removeClicked', this);
         };
 
+        
         // handle clicks
         visible.dom.addEventListener('click', toggleVisible);
         invisible.dom.addEventListener('click', toggleVisible);
@@ -116,7 +125,7 @@ class SplatItem extends Container {
             visible.dom.removeEventListener('click', toggleVisible);
             invisible.dom.removeEventListener('click', toggleVisible);
             remove.dom.removeEventListener('click', handleRemove);
-        };
+        };*/
     }
 
     set name(value: string) {

@@ -11,6 +11,7 @@ class Annotation
 {
     id: number;
     position: Vec3;
+    cameraStart: Vec3;
     defaultContent: AnnotationContent;
     variantContents: AnnotationContent[] = [];
     activity: number;
@@ -43,7 +44,7 @@ class AnnotationContent
 class AnnotationRule
 {
     on: FilterOnType;
-    filter: any[] = []; // array of emotionalState, skillLevel or expertiseLevel; maybe single value
+    filter: number[] = []; // array of emotionalState, skillLevel or expertiseLevel; maybe single value
 }
 
 class AnnotationData
