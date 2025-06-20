@@ -14,6 +14,9 @@ import autoprefixer from 'autoprefixer';
 import postcss from 'postcss';
 import sass from 'sass';
 import scss from 'rollup-plugin-scss';
+import replace from '@rollup/plugin-replace';
+import dotenv from 'dotenv';
+dotenv.config();
 
 // prod is release build
 if (process.env.BUILD_TYPE === 'prod') {
@@ -69,6 +72,12 @@ const application = {
         sourcemap: true
     },
     plugins: [
+        replace({
+            preventAssignment: true,
+            'process.env.XRTWINSCAPEUSERNAME': JSON.stringify(process.env.XRTWINSCAPEUSERNAME),
+            'process.env.XRTWINSCAPEPASSWORD': JSON.stringify(process.env.XRTWINSCAPEPASSWORD),
+            'process.env.API_URL': JSON.stringify(process.env.API_URL)
+        }),
         copyAndWatch({
             targets: [
                 {

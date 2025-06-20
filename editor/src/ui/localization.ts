@@ -203,6 +203,8 @@ const localizeInit = () => {
                     'file.export.compressed-ply': 'Compressed PLY (.ply)',
                     'file.export.splat': 'Splat file (.splat)',
                     'file.export.viewer': 'Viewer App...',
+                    'file.dashboard': 'Dashboard App...',
+                    'file.player': 'Player App...',
 
                     'render': 'Render',
                     'render.image': 'Image',

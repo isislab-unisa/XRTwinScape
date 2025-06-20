@@ -132,7 +132,7 @@ const loadCameraPoses = async (url: string, filename: string, events: Events) =>
     }
 };
 
-async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
+export async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
     const data = new AnnotationData();
     data.splat = raw.splat;
 
@@ -142,22 +142,21 @@ async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
 
         annotation.defaultContent = new AnnotationContent();
         annotation.defaultContent.content = ann.defaultContent.content;
-        annotation.defaultContent.contentType = ContentType[ann.defaultContent.contentType as keyof typeof ContentType];
+        annotation.defaultContent.contentType = ann.defaultContent.contentType;
         annotation.defaultContent.rules = (ann.defaultContent.rules || []).map((rule: any) => {
             return {
-                on: FilterOnType[rule.on as keyof typeof FilterOnType],
-                filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
+                on: rule.on,
+                filter: rule.filter
             };
         });
-
         annotation.variantContents = (ann.variantContents || []).map((vc: any) => {
             const content = new AnnotationContent();
             content.content = vc.content;
-            content.contentType = ContentType[vc.contentType as keyof typeof ContentType];
+            content.contentType = vc.contentType;
             content.rules = (vc.rules || []).map((rule: any) => {
                 return {
-                    on: FilterOnType[rule.on as keyof typeof FilterOnType],
-                    filter: rule.filter.map((val: string) => parseEnumByType(rule.on, val))
+                    on: rule.on,
+                    filter: rule.filter
                 };
             });
             return content;
@@ -179,18 +178,18 @@ async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
                 position: { x: ann.position.x, y: ann.position.y, z: ann.position.z },
                 defaultContent: {
                     content: ann.defaultContent.content,
-                    contentType: ContentType[ann.defaultContent.contentType],
-                    rules: ann.defaultContent.rules.map((rule) => ({
-                        on: FilterOnType[rule.on],
-                        filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
+                    contentType: ann.defaultContent.contentType,
+                    rules: ann.defaultContent.rules.map((rule) => ({                        
+                        on: rule.on,
+                        filter: rule.filter
                     })),
                 },
                 variantContents: ann.variantContents.map((vc) => ({
                     content: vc.content,
-                    contentType: ContentType[vc.contentType],
+                    contentType: vc.contentType,
                     rules: vc.rules.map((rule) => ({
-                        on: FilterOnType[rule.on],
-                        filter: rule.filter.map((val) => parseEnumByType(FilterOnType[rule.on].toString() as keyof typeof FilterOnType, val.toString()))
+                        on: rule.on,
+                        filter: rule.filter
                     })),
                 })),
                 activity: ann.activity,
@@ -204,8 +203,8 @@ async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
 }
 
 // Helper to map string values to correct enum based on the rule's "on" field
-function parseEnumByType(on: keyof typeof FilterOnType, value: string): number {
-    switch (on) {
+function parseEnumByType(on: number, value: string): number {
+    switch (FilterOnType[on]) {
         case "Emotional":
             return EmotionalState[value as keyof typeof EmotionalState];
         case "Skill":
