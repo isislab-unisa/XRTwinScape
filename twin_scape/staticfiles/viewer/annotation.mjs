@@ -319,16 +319,16 @@ export class Annotation extends Script {
         var content = this.annotationData.defaultContent.content;
         var innerHTML = '';
         switch (contentType) {
-            case "Text":
+            case 0: //Text
                 innerHTML = `<p>${content}</p>`;
                 break;
-            case "Image":
+            case 1: //Image
                 innerHTML = `<img src="${content}" alt="Annotation Image" style="max-width: 300px; max-height: 300px;">`;
                 break;
-            case "Video":
+            case 2: //Video
                 innerHTML = `<video src="${content}" controls autoplay muted width="320" height="240"></video>`;
                 break;
-            case "Audio":
+            case 3: //Audio
                 // innerHTML = `<audio controls><source src="${content}" type="audio/mpeg">Non supported</audio>`;
                 innerHTML = `<video src="${content}" controls autoplay width="320" height="40"></video>`;
                 break;
