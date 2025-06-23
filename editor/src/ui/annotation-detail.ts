@@ -9,6 +9,8 @@ import audioVariantSvg from './svg/audio variant.svg';
 import videoVariantSvg from './svg/video variant.svg';
 import { Tooltips } from './tooltips';
 import { Annotation, AnnotationContent, AnnotationData, ContentType, FilterOnType} from 'src/annotation';
+import { lessonFolder } from 'src/main';
+import { uploadFile } from 'src/storage-manager';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -492,15 +494,15 @@ class AnnotationDetail extends Container {
 
             // Update filter buttons
             const filterButtons = [
-            { button: annotationVariantBoredButton, type: 'Bored', on: FilterOnType.Emotional },
-            { button: annotationVariantEngagedButton, type: 'Engaged', on: FilterOnType.Emotional },
-            { button: annotationVariantFrustratedButton, type: 'Frustrated', on: FilterOnType.Emotional },
-            { button: annotationVariantEasyButton, type: 'Easy', on: FilterOnType.Skill },
-            { button: annotationVariantMediumButton, type: 'Medium', on: FilterOnType.Skill },
-            { button: annotationVariantHardButton, type: 'Hard', on: FilterOnType.Skill },
-            { button: annotationVariantBeginnerButton, type: 'Beginner', on: FilterOnType.Expertise },
-            { button: annotationVariantIntermediateButton, type: 'Intermediate', on: FilterOnType.Expertise },
-            { button: annotationVariantExpertButton, type: 'Expert', on: FilterOnType.Expertise }
+            { button: annotationVariantBoredButton, type: 0, on: FilterOnType.Emotional },
+            { button: annotationVariantEngagedButton, type: 1, on: FilterOnType.Emotional },
+            { button: annotationVariantFrustratedButton, type: 2, on: FilterOnType.Emotional },
+            { button: annotationVariantEasyButton, type: 0, on: FilterOnType.Skill },
+            { button: annotationVariantMediumButton, type: 1, on: FilterOnType.Skill },
+            { button: annotationVariantHardButton, type: 2, on: FilterOnType.Skill },
+            { button: annotationVariantBeginnerButton, type: 0, on: FilterOnType.Expertise },
+            { button: annotationVariantIntermediateButton, type: 1, on: FilterOnType.Expertise },
+            { button: annotationVariantExpertButton, type: 2, on: FilterOnType.Expertise }
             ];
 
             filterButtons.forEach(({ button }) => button.class.remove('annotationdetail-filterbutton-selected'));
@@ -670,19 +672,26 @@ class AnnotationDetail extends Container {
             fileInput.click();
 
             // Handle file selection
-            fileInput.onchange = () => {
-                if (fileInput.files && fileInput.files.length > 0) {
-                    const file = fileInput.files[0];
-                    annotationDetailUploadFilenameLabel.value = file.name;
-                    currentVariant.content = file.name;
+            fileInput.onchange = async () => {
+            if (fileInput.files && fileInput.files.length > 0) {
+                events.fire('startSpinner');
+                const file = fileInput.files[0];
+                annotationDetailUploadFilenameLabel.value = file.name;
 
-                    // Optionally, you can handle file upload logic here
-                    console.log('Selected file:', file);
+                try {
+                    const uploadedUrl = await uploadFile(`${lessonFolder}/${file.name}`, file);
+                    currentVariant.content = file.name;
+                    console.log('File uploaded: ', uploadedUrl);
+                } catch (err) {
+                    console.error('File upload failed:', err);        
+                } finally {
+                    events.fire('stopSpinner');
                 }
+            }
             };
         });
 
-        const toggleFilter = (button: Container, type: string, on: FilterOnType) => {
+        const toggleFilter = (button: Container, type: number, on: FilterOnType) => {
             const currentVariant = this.annotationToEdit.variantContents[this.variantIndex - 1] || this.annotationToEdit.defaultContent;
 
             let rule = currentVariant.rules.find(r => r.on === on);
@@ -711,39 +720,39 @@ class AnnotationDetail extends Container {
         };
 
         annotationVariantBoredButton.on('click', () => {
-            toggleFilter(annotationVariantBoredButton, 'Bored', FilterOnType.Emotional);
+            toggleFilter(annotationVariantBoredButton, 0, FilterOnType.Emotional);
         });
 
         annotationVariantEngagedButton.on('click', () => {
-            toggleFilter(annotationVariantEngagedButton, 'Engaged', FilterOnType.Emotional);
+            toggleFilter(annotationVariantEngagedButton, 1, FilterOnType.Emotional);
         });
 
         annotationVariantFrustratedButton.on('click', () => {
-            toggleFilter(annotationVariantFrustratedButton, 'Frustrated', FilterOnType.Emotional);
+            toggleFilter(annotationVariantFrustratedButton, 2, FilterOnType.Emotional);
         });
 
         annotationVariantEasyButton.on('click', () => {
-            toggleFilter(annotationVariantEasyButton, 'Easy', FilterOnType.Skill);
+            toggleFilter(annotationVariantEasyButton, 0, FilterOnType.Skill);
         });
 
         annotationVariantMediumButton.on('click', () => {
-            toggleFilter(annotationVariantMediumButton, 'Medium', FilterOnType.Skill);
+            toggleFilter(annotationVariantMediumButton, 1, FilterOnType.Skill);
         });
 
         annotationVariantHardButton.on('click', () => {
-            toggleFilter(annotationVariantHardButton, 'Hard', FilterOnType.Skill);
+            toggleFilter(annotationVariantHardButton, 2, FilterOnType.Skill);
         });
 
         annotationVariantBeginnerButton.on('click', () => {
-            toggleFilter(annotationVariantBeginnerButton, 'Beginner', FilterOnType.Expertise);
+            toggleFilter(annotationVariantBeginnerButton, 0, FilterOnType.Expertise);
         });
 
         annotationVariantIntermediateButton.on('click', () => {
-            toggleFilter(annotationVariantIntermediateButton, 'Intermediate', FilterOnType.Expertise);
+            toggleFilter(annotationVariantIntermediateButton, 1, FilterOnType.Expertise);
         });
 
         annotationVariantExpertButton.on('click', () => {
-            toggleFilter(annotationVariantExpertButton, 'Expert', FilterOnType.Expertise);
+            toggleFilter(annotationVariantExpertButton, 2, FilterOnType.Expertise);
         });
 
     }

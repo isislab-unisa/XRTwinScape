@@ -69,8 +69,8 @@ def pick_annotation_from_minio(request, annotation):
     except FileNotFoundError:
         return JsonResponse({"error": "File not found"}, status=404)
 
-@login_required
-@require_http_methods(['POST'])
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def render_xrts_viewer(request):
     return render(request, 'viewer/xrts-viewer.html', context={'resource': request.POST.get('resource'),
                                                                'title': request.POST.get('title'),
