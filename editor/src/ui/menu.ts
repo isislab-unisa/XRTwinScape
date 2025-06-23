@@ -133,6 +133,32 @@ class Menu extends Container {
         }]);
 
         const fileMenuPanel = new MenuPanel([{
+            text: localize('file.save'),
+            icon: createSvg(sceneSave),            
+            onSelect: async () => await events.invoke('xrtwinscape.save')
+        }, {
+            text: localize('file.dashboard'),
+            icon: createSvg(sceneImport),
+            onSelect: async () => {
+                await events.invoke('xrtwinscape.dashboard');
+            }
+        }, {
+            text: localize('file.player'),
+            icon: createSvg(sceneExport),
+            onSelect: async () => {
+                await events.invoke('xrtwinscape.openplayer');
+            }
+        }, { // TODO publish on marketplace
+            text: localize('file.publish'),
+            icon: createSvg(scenePublish),
+            onSelect: async () => {
+                await events.invoke('xrtwinscape.publish');
+            }
+        }]);
+
+        // OLD MENU
+        /*
+        const fileMenuPanel = new MenuPanel([{
             text: localize('file.new'),
             icon: createSvg(sceneNew),
             isEnabled: () => !events.invoke('scene.empty'),
@@ -172,7 +198,7 @@ class Menu extends Container {
             icon: createSvg(scenePublish),
             isEnabled: () => !events.invoke('scene.empty'),
             onSelect: async () => await events.invoke('show.publishSettingsDialog')
-        }]);
+        }]);*/
 
         const selectionMenuPanel = new MenuPanel([{
             text: localize('select.all'),

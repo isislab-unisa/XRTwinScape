@@ -5,7 +5,7 @@ import { registerDocEvents } from './doc';
 import { EditHistory } from './edit-history';
 import { registerEditorEvents } from './editor';
 import { Events } from './events';
-import { initFileHandler } from './file-handler';
+import { initFileHandler, loadAnnotationDataFromJSON } from './file-handler';
 import { registerPlySequenceEvents } from './ply-sequence';
 import { registerPublishEvents } from './publish';
 import { registerRenderEvents } from './render';
@@ -25,6 +25,12 @@ import { SphereSelection } from './tools/sphere-selection';
 import { ToolManager } from './tools/tool-manager';
 import { registerTransformHandlerEvents } from './transform-handler';
 import { EditorUI } from './ui/editor';
+import { getFile } from './storage-manager';
+import { Splat } from './splat';
+import { registerXRTwinScapeEvents } from './xrtwinscape-doc';
+import { FilterOnType } from './annotation';
+
+export let lessonFolder: string = null;
 
 declare global {
     interface LaunchParams {
@@ -65,6 +71,14 @@ const getURLArgs = () => {
     return config;
 };
 
+const getLessonFolderFromURL = () => {
+    const url = new URL(window.location.href);
+    const folder = url.searchParams.get('lesson');
+    if (folder) {
+        lessonFolder = decodeURIComponent(folder);
+    }
+}
+
 const initShortcuts = (events: Events) => {
     const shortcuts = new Shortcuts(events);
 
@@ -103,6 +117,7 @@ const main = async () => {
 
     // url
     const url = new URL(window.location.href);
+    getLessonFolderFromURL();
 
     // decode remote storage details
     let remoteStorageDetails;
@@ -129,6 +144,39 @@ const main = async () => {
     const overrides = [
         getURLArgs()
     ];
+
+    // endpoint: http://twinscape:8001/
+
+
+    // TODO get auth token from backend (root;root) method POST /api/token/ body:
+    /* 
+        {
+            "username": "root",
+            "password": "root"
+        }
+        rifare ogni 15 minuti per aggionare il token
+    */
+    // TODO get folder name from get params and store it globally
+    // TODO on scene loaded: get the splat.ply file and splat.json file from the storage
+    //      load ply and import annotations
+    // TODO on save: upload json file
+    // TODO on file chosen in content: upload file to the storage
+    // TODO add camera position to annotation json
+    // TODO remove debug buttons (import splat, import/export annotations)
+    // TODO change file menu, it must have only: Save, Publish, Dashboard, Player
+
+    // get file:
+    // http://localhost:80/get_data_from_minio/?resource=LESSONNAME/FILENAME
+    // upload file:
+    // http://localhost:80/upload_data_on_minio/
+    //    body: FormData with resource and file
+
+    const username = process.env.XRTWINSCAPEUSERNAME;
+    const password = process.env.XRTWINSCAPEPASSWORD;
+    console.log('Username:', username);
+    console.log('Password:', password);
+  
+    console.log('Lesson folder:', lessonFolder);
 
     // resolve scene config
     const sceneConfig = getSceneConfig(overrides);
@@ -250,6 +298,7 @@ const main = async () => {
     registerPlySequenceEvents(events);
     registerPublishEvents(events);
     registerDocEvents(scene, events);
+    registerXRTwinScapeEvents(scene, events);
     registerRenderEvents(scene, events);
     initShortcuts(events);
     initFileHandler(scene, events, editorUI.appContainer.dom, remoteStorageDetails);
@@ -261,6 +310,25 @@ const main = async () => {
     const loadList = url.searchParams.getAll('load');
     for (const value of loadList) {
         await events.invoke('import', decodeURIComponent(value));
+    }
+
+    if(lessonFolder){
+        getFile(`${lessonFolder}/splat.ply`).then(async (blob: Blob) => {
+            const model = await scene.assetLoader.loadModel({ url: URL.createObjectURL(blob), filename: "splat.ply", animationFrame: false });
+            scene.add(model);
+            getFile(`${lessonFolder}/splat.json`).then(async (blob: Blob) => {
+                const jsonText = await blob.text();
+                const annotationsRaw = JSON.parse(jsonText);
+                const annotations = await loadAnnotationDataFromJSON(annotationsRaw);
+                model.annotations = annotations;
+                events.fire('selection.changed', model);
+            }).catch((err) => {
+                console.error('Failed to load splat.json:', err);
+            });
+        }).catch((err) => {
+            console.error('Failed to load splat.ply:', err);
+        });
+        
     }
 
     // handle OS-based file association in PWA mode
