@@ -16,7 +16,7 @@ class LessonAdmin(ModelAdmin):
     # list_filter = ('status', 'user')
     search_fields = ['title', 'description']
     date_hierarchy = 'creation_time'
-    readonly_fields = ['user', 'status']
+    readonly_fields = ['user']
 
     class Media:
         
@@ -33,7 +33,7 @@ class LessonAdmin(ModelAdmin):
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status'] # 'user', status 
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status', 'ref_ply', 'ref_annotations'] # 'user', status 
         return fields
 
     def get_readonly_fields(self, request, obj=None):

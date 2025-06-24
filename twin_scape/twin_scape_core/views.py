@@ -25,8 +25,8 @@ from django.core.files.base import ContentFile
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
 build_lock = Lock(redis_client, "build_lock")
 
-@login_required
-@require_http_methods(['GET'])
+# @login_required
+# @require_http_methods(['GET'])
 def pick_data_from_minio(request, resource):
     try:
         file_name = base64.b64decode(resource).decode('utf-8')
@@ -47,38 +47,13 @@ def pick_data_from_minio(request, resource):
     except FileNotFoundError:
         return JsonResponse({"error": "File not found"}, status=404)
 
+def render_xrts_viewer(request):
+    return render(request, 'viewer/xrts-viewer.html', context={'title': request.GET.get('title')})
+
 @login_required
 @require_http_methods(['GET'])
-def pick_annotation_from_minio(request, annotation):
-    try:
-        file_name = base64.b64decode(annotation).decode('utf-8')
-        print(f"[DEBUG] Decoded file_name from base64: {file_name}")
-    except Exception as e:
-        return JsonResponse({"error": f"Invalid base64 encoding: {str(e)}"}, status=400)
-
-    if not file_name:
-        return JsonResponse({"error": "File name not provided"}, status=400)
-
-    minio_storage = MinioStorage()
-
-    try:
-        file = minio_storage.open(file_name, mode='rb')
-        response = FileResponse(file, as_attachment=True, filename=file_name)
-        response['Content-Type'] = 'application/json'
-        return response
-    except FileNotFoundError:
-        return JsonResponse({"error": "File not found"}, status=404)
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def render_xrts_viewer(request):
-    return render(request, 'viewer/xrts-viewer.html', context={'resource': request.POST.get('resource'),
-                                                               'title': request.POST.get('title'),
-                                                               'annotation': request.POST.get('annotation')})
-# @login_required
-# @require_http_methods(['GET'])
-# def render_annotator(request):
-#     return redirect(f"http://localhost:3000/?code=xxxx")
+def render_annotator(request):
+    return redirect(f"http://localhost:3000/?code={request.GET.get('code')}")
 
 @login_required
 @require_http_methods(['POST'])
