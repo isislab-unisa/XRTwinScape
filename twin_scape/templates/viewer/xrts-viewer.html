@@ -381,18 +381,26 @@
         </script>
 		
         <script>
-            // Don't touch those lines
-            window.resourceFromDjango = "{{ resource|escapejs }}";
-            window.annotationFromDjango = "{{annotation|escapejs}}";
-            const resource = window.resourceFromDjango;
-            const annotation = window.annotationFromDjango;
-            console.log("annotation: ",annotation)
+        const title = "{{ title|escapejs }}";
+
+        // Definizione delle variabili
+        const resource = title.toLowerCase() + "/splt.ply";
+        const annotation = title.toLowerCase() + "/splat.json";
+
+        // Assegnamento a variabili globali
+        window.resourceFromDjango = resource;
+        window.annotationFromDjango = annotation;
+
+        // Debug: stampa corretta
+        console.log("annotation: ", annotation);
+        console.log("resource: ", resource);
         </script>
+
         <script type="module">
 
 			var  camera, annotations;
             // "http://localhost/static/viewer/conf.json"
-			fetch(`/pick_annotation_from_minio/${annotation}`)
+			fetch(`/pick_data_from_minio/${annotation}`)
 				.then(res => res.json())
 				.then(config => {
 					camera = config.camera;
