@@ -19,10 +19,7 @@ class LessonAdmin(ModelAdmin):
     readonly_fields = ['user', 'status']
 
     class Media:
-        
-        js = (
-            'viewer/file.js',
-        )
+        js = ('viewer/file.js',)
     
     def get_tags(self, obj):
         return ", ".join(tag.name for tag in obj.tag.all())

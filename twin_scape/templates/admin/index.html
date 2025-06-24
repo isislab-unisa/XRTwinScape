@@ -94,7 +94,7 @@
         {% endcomponent %}
 
         <!-- Table -->
-        {% component "unfold/components/card.html" with title="Lezioni" class="p-6 shadow-sm hover:shadow-md transition-shadow" %}
+        {% component "unfold/components/card.html" with title="Lessons" class="p-6 shadow-sm hover:shadow-md transition-shadow" %}
             <div class="w-full overflow-x-auto">
                 <table class="min-w-full responsive-table">
                     <thead>
@@ -145,7 +145,7 @@
 
                                     <td data-label="Azioni" class="px-4 py-2 border-b">
                                         <div class="button-group">
-                                            {% if lesson.status == "READY" %}
+                                            {% if lesson.status == "READY" and lesson.user == request.session.user%}
                                                 <form method="post" action="{% url 'build' %}" class="flex flex-col md:flex-row gap-2">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="lesson_id" value="{{ lesson.pk }}">
@@ -159,7 +159,8 @@
                                                 </form>
                                             {% endif %}
 
-                                            {% if lesson.status == "BUILT" %}
+                                            {% if lesson.status == "BUILT"%}
+                                                {%if lesson.user == request.session.user%}
                                                 <div class="flex flex-col md:flex-row gap-2">
                                                     <form method="get" action="http://localhost:3000/" class="w-full">
                                                         <input type="hidden" name="title" value="{{ lesson.title }}_{{lesson.id}}">
@@ -167,7 +168,7 @@
                                                             Annotate
                                                         </button>
                                                     </form>
-
+                                                {%endif%}
                                                     <form id="modelForm" method="get" action="{% url 'render_xrts_viewer' %}" class="w-full">
                                                     <input type="hidden" name="title" value="{{ lesson.title }}_{{lesson.id}}">
                                                     

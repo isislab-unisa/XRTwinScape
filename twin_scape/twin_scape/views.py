@@ -25,7 +25,7 @@ def dashboard_callback(request, context):
         running_lesson = Lesson.objects.filter(user=request.user, status="RUNNING").count()
         failed_lesson = Lesson.objects.filter(user=request.user, status="FAILED").count()
         building_lesson = Lesson.objects.filter(user=request.user, status="BUILDING").count()
-        lessons = Lesson.objects.filter(user=request.user)
+        lessons = Lesson.objects.all()
     
     for lesson in lessons:
         if lesson.ref_ply:
