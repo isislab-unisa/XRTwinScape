@@ -16,7 +16,7 @@ class LessonAdmin(ModelAdmin):
     # list_filter = ('status', 'user')
     search_fields = ['title', 'description']
     date_hierarchy = 'creation_time'
-    readonly_fields = ['user']
+    readonly_fields = ['user', 'status']
 
     class Media:
         
@@ -33,7 +33,7 @@ class LessonAdmin(ModelAdmin):
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status', 'ref_ply', 'ref_annotations'] # 'user', status 
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status'] # 'user', status 
         return fields
 
     def get_readonly_fields(self, request, obj=None):
@@ -59,27 +59,27 @@ class LessonAdmin(ModelAdmin):
             initial['user'] = request.user.pk
         return initial
     
-    # def has_change_permission(self, request, obj=None):
-    #     has_permission = super().has_change_permission(request, obj)
-    #     if not has_permission:
-    #         return False
-    #     if obj is None:
-    #         return True
-    #     if obj.status in ['BUILT', 'BUILDING', 'RUNNING']:
-    #         return False
-    #     return True
+    def has_change_permission(self, request, obj=None):
+        has_permission = super().has_change_permission(request, obj)
+        if not has_permission:
+            return False
+        if obj is None:
+            return True
+        if obj.status in ['BUILT', 'BUILDING', 'RUNNING', 'ENQUEUED']:
+            return False
+        return True
     
-    # def has_delete_permission(self, request, obj=None):
-    #     has_permission = super().has_delete_permission(request, obj)
-    #     if not has_permission:
-    #         return False
-    #     if obj is None:
-    #         return True
-    #     if obj.status in ['RUNNING', 'BUILDING']:
-    #         return False
+    def has_delete_permission(self, request, obj=None):
+        has_permission = super().has_delete_permission(request, obj)
+        if not has_permission:
+            return False
+        if obj is None:
+            return True
+        if obj.status in ['RUNNING', 'BUILDING', 'ENQUEUED']:
+            return False
         
-    #     if obj.user != request.user:
-    #         return False
-    #     return True
+        if obj.user != request.user:
+            return False
+        return True
 
 admin.site.register(Lesson, LessonAdmin)
