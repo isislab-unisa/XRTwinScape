@@ -45,6 +45,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = [
     "xrtwinscape.di.unisa.it",
+    os.environ.get('IP'),
     "localhost",
     "127.0.0.1",
     "[::1]",
