@@ -16,7 +16,7 @@ import redis
 from redis.lock import Lock
 import mimetypes
 from rest_framework.decorators import api_view, permission_classes, authentication_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 import json
 from django.core.files.base import ContentFile
@@ -25,8 +25,8 @@ from django.core.files.base import ContentFile
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
 build_lock = Lock(redis_client, "build_lock")
 
-# @login_required
-# @require_http_methods(['GET'])
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def pick_data_from_minio(request, resource):
     try:
         file_name = base64.b64decode(resource).decode('utf-8')
@@ -47,6 +47,8 @@ def pick_data_from_minio(request, resource):
     except FileNotFoundError:
         return JsonResponse({"error": "File not found"}, status=404)
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
 def render_xrts_viewer(request):
     return render(request, 'viewer/xrts-viewer.html', context={'title': request.GET.get('title')})
 
