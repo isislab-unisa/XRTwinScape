@@ -28,7 +28,7 @@ import { EditorUI } from './ui/editor';
 import { getFile } from './storage-manager';
 import { Splat } from './splat';
 import { registerXRTwinScapeEvents } from './xrtwinscape-doc';
-import { FilterOnType } from './annotation';
+import { AnnotationData, FilterOnType } from './annotation';
 
 export let lessonFolder: string = null;
 
@@ -317,11 +317,19 @@ const main = async () => {
             const model = await scene.assetLoader.loadModel({ url: URL.createObjectURL(blob), filename: "splat.ply", animationFrame: false });
             scene.add(model);
             getFile(`${lessonFolder}/splat.json`).then(async (blob: Blob) => {
-                const jsonText = await blob.text();
-                const annotationsRaw = JSON.parse(jsonText);
-                const annotations = await loadAnnotationDataFromJSON(annotationsRaw);
-                model.annotations = annotations;
-                events.fire('selection.changed', model);
+                if(blob) {
+                    const jsonText = await blob.text();
+                    const annotationsRaw = JSON.parse(jsonText);
+                    const annotations = await loadAnnotationDataFromJSON(annotationsRaw);
+                    model.annotations = annotations;
+                    events.fire('selection.changed', model);
+                }
+                else
+                {
+                    model.annotations = new AnnotationData();
+                    model.annotations.splat = "splat.ply";
+                    events.fire('selection.changed', model);
+                }
             }).catch((err) => {
                 console.error('Failed to load splat.json:', err);
             });

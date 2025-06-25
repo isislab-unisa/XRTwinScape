@@ -25,22 +25,29 @@ export async function uploadFile(resource: string, file: Blob | string): Promise
     return await response.text();
 }
 
-export async function getFile(resource: string): Promise<Blob> {
-    await updateAccessToken();
+export async function getFile(resource: string): Promise<Blob | null> {
     const headersList = {
         "Accept": "*/*",
-        "Authorization": `Bearer ${accessToken}`        
     };
 
-    const response = await fetch(
-        `${process.env.API_URL}/get_data_from_minio/?resource=${encodeURIComponent(resource)}`,
-        {
-            method: "GET",
-            headers: headersList
-        }
-    );
+    try {
+        const response = await fetch(
+            `${process.env.API_URL}/get_data_from_minio/?resource=${encodeURIComponent(resource)}`,
+            {
+                method: "GET",
+                headers: headersList
+            }
+        );
 
-    return await response.blob();
+        if (response.status === 404) {
+            return null;
+        }
+
+        return await response.blob();
+    } catch (error: any) {
+        return null;
+    }
+
 }
 
 export async function deleteFile(resource: string): Promise<string> {
