@@ -30,7 +30,7 @@ class LessonAdmin(ModelAdmin):
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status'] # 'user', status 
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status', 'splat_ply', 'annotation_ply'] # 'user', status 
         return fields
 
     def get_readonly_fields(self, request, obj=None):
