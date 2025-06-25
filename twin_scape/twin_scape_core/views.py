@@ -146,7 +146,7 @@ def get_images(request, id):
         return JsonResponse({"error": "Errore durante il recupero dell'immagine."}, status=500)
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
+@permission_classes([AllowAny])
 def get_data_from_minio(request):
     storage = MinioStorage()
     resource = request.GET.get('resource')
