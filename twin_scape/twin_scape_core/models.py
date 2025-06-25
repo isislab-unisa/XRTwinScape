@@ -56,6 +56,8 @@ class Lesson(models.Model):
         choices=Status.choices,
         default=Status.READY
     )
+    splat_ply = models.FileField(upload_to="", storage=MinioStorage(), null=True, blank=True)
+    annotation_ply = models.FileField(upload_to="", storage=MinioStorage(), null=True, blank=True)
     ref_ply = models.CharField(max_length=64, null=True, blank=True)
     ref_annotations = models.CharField(max_length=64, null=True, blank=True)
     lesson_visibility = models.BooleanField(default=True)
@@ -81,6 +83,8 @@ class Lesson(models.Model):
         is_new = self.pk is None
         original_image = self.images
         original_video = self.video_file
+        splat_ply = self.splat_ply
+        annotation_ply = self.annotation_ply
 
         if original_video:
             mime_type, _ = mimetypes.guess_type(original_video.name)
@@ -105,6 +109,27 @@ class Lesson(models.Model):
                 if storage.exists(image_name):
                     storage.delete(image_name)
                 self.images.save(image_path, ContentFile(image_content), save=False)
+        
+        if splat_ply and '/' not in str(splat_ply):
+            with splat_ply.open('rb') as splat_file:
+                splat_content = splat_file.read()
+                splat_name = os.path.basename(splat_ply.name)
+                splat_path = f"{folder_name}/{splat_name}"
+                if storage.exists(splat_name):
+                    storage.delete(splat_name)
+                self.splat_ply.save(splat_path, ContentFile(splat_content), save=False)
+                self.ref_ply = f"{folder_name}/{splat_name}"
+                self.status = Status.BUILT
+        
+        if annotation_ply and '/' not in str(annotation_ply):
+            with annotation_ply.open('rb') as annotation_file:
+                annotation_content = annotation_file.read()
+                annotation_name = os.path.basename(annotation_ply.name)
+                annotation_path = f"{folder_name}/{annotation_name}"
+                if storage.exists(annotation_name):
+                    storage.delete(annotation_name)
+                self.annotation_ply.save(annotation_path, ContentFile(annotation_content), save=False)
+                self.ref_annotations = f"{folder_name}/{annotation_name}" 
 
         if original_video and '/' not in str(original_video):
             with original_video.open('rb') as vid_file:
