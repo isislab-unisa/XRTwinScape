@@ -10,8 +10,7 @@ enum FilterOnType {Emotional, Skill, Expertise};
 class Annotation
 {
     id: number;
-    position: Vec3;
-    cameraStart: Vec3;
+    position: Vec3;    
     defaultContent: AnnotationContent;
     variantContents: AnnotationContent[] = [];
     activity: number;
@@ -34,6 +33,12 @@ class Annotation
 
 }
 
+class AnnotationCamera
+{
+    position: Vec3;
+    target: Vec3;
+}
+
 class AnnotationContent
 {
     content: any;
@@ -51,6 +56,7 @@ class AnnotationData
 {
     annotations: Annotation[] = [];
     splat: string;
+    camera: AnnotationCamera;
 }
 
 export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}

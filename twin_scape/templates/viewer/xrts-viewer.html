@@ -384,7 +384,7 @@
         const title = "{{ title|escapejs }}";
 
         // Definizione delle variabili
-        const resource = title.toLowerCase() + "/splt.ply";
+        const resource = title.toLowerCase() + "/splat.ply";
         const annotation = title.toLowerCase() + "/splat.json";
 
         // Assegnamento a variabili globali
@@ -400,7 +400,7 @@
 
 			var  camera, annotations;
             // "http://localhost/static/viewer/conf.json"
-			fetch(`/pick_data_from_minio/${annotation}`)
+			fetch(`/get_data_from_minio/?resource=${annotation}`)
 				.then(res => res.json())
 				.then(config => {
 					camera = config.camera;
@@ -413,7 +413,7 @@
 							settings: {"camera":{"fov":50,"position":camera.position,
 							"target":camera.target,"startAnim":"none","animTrack":null},
 							"background":{"color":[0.4,0.4,0.4]},"animTracks":[]},
-							contentUrl: `/pick_data_from_minio/${resource}`,
+							contentUrl: `/get_data_from_minio/?resource=${resource}`,
 							//http://127.0.0.1:5500/xrts-viewer.html?sdata=http://127.0.0.1:5500/koala_stuffie.ply
 						};
 						const annotationsContainer = document.getElementsByTagName('pc-scene')[0];
