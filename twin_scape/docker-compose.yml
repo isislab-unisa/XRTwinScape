@@ -66,7 +66,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx.conf:/etc/nginx/nginx.conf
       - ./staticfiles:/workspace/staticfiles
     depends_on:
       - web
