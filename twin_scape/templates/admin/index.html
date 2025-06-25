@@ -145,7 +145,7 @@
 
                                     <td data-label="Azioni" class="px-4 py-2 border-b">
                                         <div class="button-group">
-                                            {% if lesson.status == "READY" and lesson.user == request.session.user%}
+                                            {% if lesson.status == "READY" and lesson.user == request.user %}
                                                 <form method="post" action="{% url 'build' %}" class="flex flex-col md:flex-row gap-2">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="lesson_id" value="{{ lesson.pk }}">
@@ -160,7 +160,7 @@
                                             {% endif %}
 
                                             {% if lesson.status == "BUILT"%}
-                                                {%if lesson.user == request.session.user%}
+                                                {%if lesson.user == request.user%}
                                                 <div class="flex flex-col md:flex-row gap-2">
                                                     <form method="get" action="http://localhost:3000/" class="w-full">
                                                         <input type="hidden" name="title" value="{{ lesson.title }}_{{lesson.id}}">
