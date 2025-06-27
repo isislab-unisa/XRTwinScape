@@ -410,13 +410,19 @@
                     
                     // console.log(resource)
 					window.sse = {
-							settings: {"camera":{"fov":50,"position":[camera.position.x, camera.position.y, camera.position.z].join(' '),
-							"target":[camera.target.x, camera.target.y, camera.target.z].join(' '),"startAnim":"none","animTrack":null},
+							settings: {"camera":{"fov":50,"position":[camera.position.x, camera.position.y, camera.position.z],
+							"target":[camera.target.x, camera.target.y, camera.target.z],"startAnim":"none","animTrack":null},
 							"background":{"color":[0.4,0.4,0.4]},"animTracks":[]},
 							contentUrl: `/get_data_from_minio/?resource=${resource}`,
 							//http://127.0.0.1:5500/xrts-viewer.html?sdata=http://127.0.0.1:5500/koala_stuffie.ply
 						};
+
+                        console.log("Camera settings:", window.sse.settings.camera);
 						const annotationsContainer = document.getElementsByTagName('pc-scene')[0];
+                        const utilScript = document.createElement('script');
+                        utilScript.type = 'module';
+                        utilScript.src = 'http://localhost/static/viewer/util.js';
+                        document.head.appendChild(utilScript);
 							
 				
 							annotations.forEach(annotation => {
@@ -450,8 +456,8 @@
 			
 		
         </script>
-	    <script type="module" src= " http://localhost/static/viewer/util.js"></script>
-		<!--<script type="module" src="https://cdn.jsdelivr.net/npm/@playcanvas/web-components@0.2.5/dist/pwc.mjs"></script>-->
+	    <!-- <script type="module" src= " http://localhost/static/viewer/util.js"></script> -->
+		<!-- <script type="module" src="https://cdn.jsdelivr.net/npm/@playcanvas/web-components@0.2.5/dist/pwc.mjs"></script> -->
     </head>
     <body>
         <div id="topbar">
