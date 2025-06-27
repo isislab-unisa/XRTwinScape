@@ -49,6 +49,7 @@ class ScenePanel extends Container {
             class: 'panel-header-label'
         });
 
+        /* DISABLED SCENE IMPORT
         const sceneImport = new Container({
             class: 'panel-header-button'
         });
@@ -62,10 +63,10 @@ class ScenePanel extends Container {
         const sceneAnnotationImport = new Container({
             class: 'panel-header-button'
         });
-        sceneAnnotationImport.dom.appendChild(createSvg(sceneImportSvg));
+        sceneAnnotationImport.dom.appendChild(createSvg(sceneImportSvg));*/
 
         sceneHeader.append(sceneIcon);
-        sceneHeader.append(sceneLabel);
+        sceneHeader.append(sceneLabel);/*
         sceneHeader.append(sceneImport);
         sceneHeader.append(sceneNew);
         sceneHeader.append(sceneAnnotationImport);
@@ -84,7 +85,7 @@ class ScenePanel extends Container {
 
         tooltips.register(sceneImport, 'Import Scene', 'top');        
         tooltips.register(sceneNew, 'New Scene', 'top');
-        tooltips.register(sceneAnnotationImport, 'Import Annotations', 'top');
+        tooltips.register(sceneAnnotationImport, 'Import Annotations', 'top');*/
 
         const splatList = new SplatList(events);
 
@@ -124,6 +125,7 @@ class ScenePanel extends Container {
             class: 'panel-header-label'
         });
 
+        /* DISABLED DEBUG ANNOTATION EXPORT
         const sceneAnnotationExport = new Container({
             class: 'panel-header-button'
         });
@@ -133,7 +135,7 @@ class ScenePanel extends Container {
             await events.invoke('scene.annotationExport');
         });
 
-        tooltips.register(sceneAnnotationExport, 'Export Annotations', 'top');
+        tooltips.register(sceneAnnotationExport, 'Export Annotations', 'top');*/
 
         // Add button for adding annotations
         const sceneAnnotationAdd = new Container({
@@ -178,7 +180,7 @@ class ScenePanel extends Container {
 
         annotationHeader.append(annotationIcon);
         annotationHeader.append(annotationLabel);
-        annotationHeader.append(sceneAnnotationExport);
+        //annotationHeader.append(sceneAnnotationExport);
         annotationHeader.append(sceneAnnotationAdd); // Append the add button after the export button
 
         const annotationList = new AnnotationList(events);

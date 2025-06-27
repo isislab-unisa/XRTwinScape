@@ -187,9 +187,9 @@ class AnnotationList extends Container
             for (const [key, value] of items) {
                 if (item === value) {
                     if (value.selected) {
-                    events.fire('annotationSelection', null);
+                        events.fire('annotationSelection', null);
                     } else {
-                    events.fire('annotationSelection', key);
+                        events.fire('annotationSelection', key);
                     }
                     break;
                 }
