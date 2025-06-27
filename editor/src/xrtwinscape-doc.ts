@@ -4,6 +4,8 @@ import { lessonFolder } from "./main";
 import { uploadFile } from "./storage-manager";
 import { AnnotationData } from "./annotation";
 import { Splat } from "./splat";
+import { BufferWriter } from "./serialize/writer";
+import { serializePly } from "./splat-serialize";
 
 const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
     events.function('xrtwinscape.save', async () => {
@@ -12,8 +14,9 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
         events.fire('startSpinner');
         try {
             // Gather annotation data (assuming scene.annotationData exists)
-            const selectedSplat = events.invoke('selection') as Splat
-            if(selectedSplat) {
+            const selectedSplat = events.invoke('selection') as Splat;
+            if (selectedSplat) {
+                // Save annotation data
                 const annotationData: AnnotationData = selectedSplat.annotations;
                 const pose = events.invoke('camera.getPose');
                 annotationData.camera = {
@@ -21,12 +24,20 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                     target: pose.target
                 };
                 const json = JSON.stringify(annotationData, null, 2);
-                const file = new File([json], "splat.json", { type: "application/json" });
-                await uploadFile(`${lessonFolder}/splat.json`, file);
+                const annotationFile = new File([json], "splat.json", { type: "application/json" });
+                await uploadFile(`${lessonFolder}/splat.json`, annotationFile);
+
+                // Save selected splat as splat.ply
+                const writer = new BufferWriter();
+                await serializePly([selectedSplat], { maxSHBands: 3 }, writer);
+                const plyBuffer = writer.close();
+                const plyFile = new File([plyBuffer], "splat.ply", { type: "application/octet-stream" });
+                await uploadFile(`${lessonFolder}/splat.ply`, plyFile);
+
                 events.fire('showPopup', {
                     type: 'info',
                     header: 'Save',
-                    message: 'Annotations saved and uploaded successfully.'
+                    message: 'Annotations and splat.ply saved and uploaded successfully.'
                 });
             }
         } catch (error) {
