@@ -6,8 +6,7 @@ COPY . .
 
 RUN apt-get update && \
     apt-get install -y default-libmysqlclient-dev build-essential && \
-    pip install -r requirements.txt && \
-    apt-get install certbot python3-certbot-nginx
+    pip install -r requirements.txt
 
 RUN apt-get update && \
 apt-get install -y ca-certificates && \
