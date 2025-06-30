@@ -17,7 +17,7 @@ const registerSelectionEvents = (events: Events, scene: Scene) => {
     };
 
     events.on('selection', (splat: Splat) => {
-        setSelection(splat);
+        setSelection(splat, false);
     });
 
     events.function('selection', () => {

@@ -75053,7 +75053,8 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                     const right = new AdditiveInput(mouseInput.left, rightKeys);
             
                     this.wheel = (event) => {
-                        mouseInput.right.value[2] += event.deltaY * 0.1;
+                        const mouseWheelDamping = 0.003;
+                        mouseInput.right.value[2] += event.deltaY * mouseWheelDamping;
                         mouseInput.left.value[0] += event.deltaX;
                         event.preventDefault();
                     };
@@ -75088,28 +75089,29 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
             
                             controls[keys[key]] = state;
             
-                            const s = 300;
+                            const moveSpeed = 12;
             
                             switch (keys[key]) {
                                 case 'left':
                                 case 'right':
-                                    leftKeys.target[0] = (controls.left ? -300 : 0) + (controls.right ? s : 0);
+                                    leftKeys.target[0] = (controls.left ? -moveSpeed : 0) + (controls.right ? moveSpeed : 0);
                                     break;
                                 case 'forward':
                                 case 'backward':
-                                    leftKeys.target[1] = (controls.forward ? -300 : 0) + (controls.backward ? s : 0);
+                                    console.log("forward")
+                                    leftKeys.target[1] = (controls.forward ? -moveSpeed : 0) + (controls.backward ? moveSpeed : 0);
                                     break;
                                 case 'up':
                                 case 'down':
-                                    leftKeys.target[2] = (controls.up ? s : 0) + (controls.down ? -300 : 0);
+                                    leftKeys.target[2] = (controls.up ? moveSpeed : 0) + (controls.down ? -moveSpeed : 0);
                                     break;
                                 case 'lookleft':
                                 case 'lookright':
-                                    rightKeys.target[0] = (controls.lookleft ? -300 : 0) + (controls.lookright ? s : 0);
+                                    rightKeys.target[0] = (controls.lookleft ? -moveSpeed : 0) + (controls.lookright ? moveSpeed : 0);
                                     break;
                                 case 'lookup':
                                 case 'lookdown':
-                                    rightKeys.target[1] = (controls.lookup ? -300 : 0) + (controls.lookdown ? s : 0);
+                                    rightKeys.target[1] = (controls.lookup ? -moveSpeed : 0) + (controls.lookdown ? moveSpeed : 0);
                                     break;
                             }
                         }
@@ -75670,7 +75672,8 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                     // set the global animation flag
                     state.hasAnimation = !!animCamera;
                     state.animationDuration = animCamera ? animCamera.cursor.duration : 0;
-                    state.cameraMode = animCamera ? 'anim' : 'orbit';
+                    // state.cameraMode = animCamera ? 'anim' : 'orbit';
+                    state.cameraMode = 'fly';
             
                     // this pose stores the current camera position. it will be blended/smoothed
                     // toward the current active camera
