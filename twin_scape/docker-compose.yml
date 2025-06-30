@@ -115,6 +115,14 @@ services:
   #   volumes:
   #     - ./full_gaussian_pipe:/workspace
 
+  editor:
+    container_name: xrtwinscape-editor
+    build: ../editor
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+
 volumes:
   mysql_data_twin_scape:
   minio_data:
