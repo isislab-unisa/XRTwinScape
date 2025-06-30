@@ -126,7 +126,7 @@ services:
       - ./certbot/conf:/etc/letsencrypt
     entrypoint: >
       sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
-      --email d.demaio16@studenti.unisa.it
+      --email ${EMAIL_CERTBOT}
       --agree-tos
       --no-eff-email
       -d xrtwinscape.di.unisa.it
