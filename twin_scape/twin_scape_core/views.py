@@ -20,6 +20,7 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 import json
 from django.core.files.base import ContentFile
+from django.views.decorators.cache import never_cache
 
 # Redis client
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
@@ -47,6 +48,7 @@ def pick_data_from_minio(request, resource):
     except FileNotFoundError:
         return JsonResponse({"error": "File not found"}, status=404)
 
+@never_cache
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def render_xrts_viewer(request):
