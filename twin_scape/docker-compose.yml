@@ -17,7 +17,6 @@ services:
   web:
     build: .
     container_name: twin_scape
-    # command: ["gunicorn", "--bind", "0.0.0.0:8000", "twin_scape.wsgi:application"]
     volumes:
       - .:/workspace
       - ./staticfiles:/workspace/staticfiles
