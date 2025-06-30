@@ -147,30 +147,6 @@ const main = async () => {
 
     // endpoint: http://twinscape:8001/
 
-
-    // TODO get auth token from backend (root;root) method POST /api/token/ body:
-    /* 
-        {
-            "username": "root",
-            "password": "root"
-        }
-        rifare ogni 15 minuti per aggionare il token
-    */
-    // TODO get folder name from get params and store it globally
-    // TODO on scene loaded: get the splat.ply file and splat.json file from the storage
-    //      load ply and import annotations
-    // TODO on save: upload json file
-    // TODO on file chosen in content: upload file to the storage
-    // TODO add camera position to annotation json
-    // TODO remove debug buttons (import splat, import/export annotations)
-    // TODO change file menu, it must have only: Save, Publish, Dashboard, Player
-
-    // get file:
-    // http://localhost:80/get_data_from_minio/?resource=LESSONNAME/FILENAME
-    // upload file:
-    // http://localhost:80/upload_data_on_minio/
-    //    body: FormData with resource and file
-
     const username = process.env.XRTWINSCAPEUSERNAME;
     const password = process.env.XRTWINSCAPEPASSWORD;
     console.log('Username:', username);
