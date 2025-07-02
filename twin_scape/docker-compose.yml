@@ -125,28 +125,28 @@ services:
     env_file:
       - .env
 
-  # certbot:
-  #   image: certbot/certbot
-  #   container_name: certbot
-  #   volumes:
-  #     - ./certbot/www:/var/www/certbot
-  #     - ./certbot/conf:/etc/letsencrypt
-  #   entrypoint: >
-  #     sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
-  #     --email ${EMAIL_CERTBOT}
-  #     --agree-tos
-  #     --no-eff-email
-  #     -d xrtwinscape.di.unisa.it
-  #     -d xrtwinscape.di.unisa.it"
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: >
+      sh -c "certbot certonly --webroot --webroot-path=/var/www/certbot
+      --email ${EMAIL_CERTBOT}
+      --agree-tos
+      --no-eff-email
+      -d xrtwinscape.di.unisa.it
+      -d xrtwinscape.di.unisa.it"
   
-  # certbot-renew:
-  #   image: certbot/certbot
-  #   container_name: certbot_renew
-  #   volumes:
-  #     - ./certbot/www:/var/www/certbot
-  #     - ./certbot/conf:/etc/letsencrypt
-  #   entrypoint: >
-  #     sh -c "certbot renew --webroot --webroot-path=/var/www/certbot && nginx -s reload"
+  certbot-renew:
+    image: certbot/certbot
+    container_name: certbot_renew
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    entrypoint: >
+      sh -c "certbot renew --webroot --webroot-path=/var/www/certbot && nginx -s reload"
 
 volumes:
   mysql_data_twin_scape:

@@ -46,6 +46,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 DEBUG = False
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = ['https://xrtwinscape.di.unisa.it']
 
 
 ALLOWED_HOSTS = [
