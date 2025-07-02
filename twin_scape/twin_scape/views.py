@@ -6,6 +6,7 @@ import base64
 from unfold.admin import ModelAdmin
 from unfold.views import UnfoldModelAdminViewMixin
 from twin_scape_core.models import Lesson
+from django.shortcuts import render
 
 # Custom dasboard view
 admin.site.index_title = 'Dashboard'
@@ -45,3 +46,13 @@ def dashboard_callback(request, context):
     })
     
     return context
+
+def home(request):
+    lessons = Lesson.objects.all()
+    
+    for lesson in lessons:
+        if lesson.ref_ply:
+            lesson.ref_ply = base64.b64encode(lesson.ref_ply.encode('utf-8')).decode('utf-8')
+        if lesson.ref_annotations:
+            lesson.ref_annotations = base64.b64encode(lesson.ref_annotations.encode('utf-8')).decode('utf-8')
+    return render(request, "home.html", context={"lessons": lessons})

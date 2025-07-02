@@ -121,7 +121,7 @@ def complete_build(request):
             print(f"[LOCK] Errore nel rilascio del lock: {e}")
             return JsonResponse({"error": "An error occurred during lock release"}, status=500)
 
-@login_required
+# @login_required
 @require_http_methods(['GET'])
 def get_images(request, id):
     try:
