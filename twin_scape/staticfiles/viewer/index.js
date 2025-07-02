@@ -1,7 +1,7 @@
 import { GSplatData, GSplatResource, BoundingBox, Color, Script, Vec3, MiniStats } from 'playcanvas';
 import { Annotation } from 'annotation'
 
-const viewerSettingsResp = fetch('http://localhost/static/viewer/settings.json')
+const viewerSettingsResp = fetch('/static/viewer/settings.json')
 
 window.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
