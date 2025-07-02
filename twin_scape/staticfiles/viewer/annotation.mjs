@@ -12,7 +12,7 @@ import {
     Script,
     StandardMaterial,
     Texture
-} from  "http://localhost/static/viewer/util.js";
+} from  "/static/viewer/util.js";
 import { ContentType } from "./annotation.js";
 
 
