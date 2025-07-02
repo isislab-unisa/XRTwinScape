@@ -137,7 +137,7 @@ services:
       --agree-tos
       --no-eff-email
       -d xrtwinscape.di.unisa.it
-      -d www.xrtwinscape.di.unisa.it"
+      -d xrtwinscape.di.unisa.it"
   
   certbot-renew:
     image: certbot/certbot
