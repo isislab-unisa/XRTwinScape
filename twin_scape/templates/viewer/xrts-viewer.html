@@ -367,13 +367,13 @@
             }
         </style>
 
-        <link rel="stylesheet" href=  "http://localhost/static/viewer/index.css">
+        <link rel="stylesheet" href=  "/static/viewer/index.css">
 		<link rel="icon" type="image/x-icon" href="favico.png"/>
         <script type="importmap">
             {
                 "imports": {
                     "playcanvas": "https://cdn.jsdelivr.net/npm/playcanvas@2.6.0/build/playcanvas.mjs",
-                    "annotation":  "http://localhost/static/viewer/annotation.mjs",
+                    "annotation":  "/static/viewer/annotation.mjs",
 					"pwc": "https://cdn.jsdelivr.net/npm/@playcanvas/web-components@0.2.5/dist/pwc.mjs"
                 }
             }
@@ -420,7 +420,7 @@
 						const annotationsContainer = document.getElementsByTagName('pc-scene')[0];
                         const utilScript = document.createElement('script');
                         utilScript.type = 'module';
-                        utilScript.src = 'http://localhost/static/viewer/util.js';
+                        utilScript.src = '/static/viewer/util.js';
                         document.head.appendChild(utilScript);
 							
 				
@@ -460,14 +460,14 @@
     </head>
     <body>
         <div id="topbar">
-            <img src="http://localhost/static/viewer/twinscape_logo.png" alt="Twinscape Logo">
+            <img src="/static/viewer/twinscape_logo.png" alt="Twinscape Logo">
             <h2 id="title">{{title}}</h2>
         </div>
         <pc-app antialias="false" depth="false" high-resolution="true" stencil="false">
-			<pc-asset id="camera-controls" src="http://localhost/static/viewer/camera-controls.mjs" preload></pc-asset>
+			<pc-asset id="camera-controls" src="/static/viewer/camera-controls.mjs" preload></pc-asset>
             <pc-asset id="xr-controllers" src="https://cdn.jsdelivr.net/npm/playcanvas@2.6.1/scripts/esm/xr-controllers.min.mjs" preload></pc-asset>
             <pc-asset id="xr-navigation" src="https://cdn.jsdelivr.net/npm/playcanvas@2.6.1/scripts/esm/xr-navigation.min.mjs" preload></pc-asset>
-            <pc-asset src= "http://localhost/static/viewer/annotation.mjs" preload></pc-asset>
+            <pc-asset src= "/static/viewer/annotation.mjs" preload></pc-asset>
 
 			<pc-scene>
                 <!-- Camera (with XR support) -->
@@ -660,6 +660,6 @@
             </div>
 		
         </div>
-		<script type="module" src="http://localhost/static/viewer/index.js"></script>
+		<script type="module" src="/static/viewer/index.js"></script>
     </body>
 </html>
