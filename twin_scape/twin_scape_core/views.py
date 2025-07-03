@@ -52,7 +52,13 @@ def pick_data_from_minio(request, resource):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def render_xrts_viewer(request):
-    return render(request, 'viewer/xrts-viewer.html', context={'title': request.GET.get('title')})
+    response = render(request, 'viewer/xrts-viewer.html', context={'title': request.GET.get('title')})
+    
+    response['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    response['Pragma'] = 'no-cache'
+    response['Expires'] = '0'
+    
+    return response
 
 @login_required
 @require_http_methods(['GET'])
