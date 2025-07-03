@@ -52,11 +52,11 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
     });
 
     events.function('xrtwinscape.dashboard', async () => {
-        window.open("http://localhost/admin/", "_blank");
+        window.open(`${process.env.API_URL}/admin/`, "_blank");
     });
 
     events.function('xrtwinscape.openplayer', async () => {
-        window.open(`http://localhost/render_xrts_viewer/?title=${encodeURIComponent(lessonFolder)}`, "_blank");
+        window.open(`${process.env.API_URL}/render_xrts_viewer/?title=${encodeURIComponent(lessonFolder)}`, "_blank");
     });
 
     events.function('xrtwinscape.publish', async () => {
