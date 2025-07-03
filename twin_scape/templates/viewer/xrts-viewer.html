@@ -386,7 +386,8 @@
         // Definizione delle variabili
         const resource = title.toLowerCase() + "/splat.ply";
         const annotation = title.toLowerCase() + "/splat.json";
-
+        
+        title = title.split("_")[0];
         // Assegnamento a variabili globali
         window.resourceFromDjango = resource;
         window.annotationFromDjango = annotation;
