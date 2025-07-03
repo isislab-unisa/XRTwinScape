@@ -1,12 +1,35 @@
 import { GSplatData, GSplatResource, BoundingBox, Color, Script, Vec3, MiniStats } from 'playcanvas';
 import { Annotation } from 'annotation'
 
-const viewerSettingsResp = fetch('/static/viewer/settings.json')
+function waitForSSE() {
+    return new Promise((resolve) => {
+        if (window.sse) {
+            resolve(window.sse);
+            return;
+        }
+
+        const checkSSE = () => {
+            if (window.sse) {
+                resolve(window.sse);
+            } else {
+                setTimeout(checkSSE, 50); // Controlla ogni 50ms
+            }
+        };
+        checkSSE();
+    });
+}
+
+// const viewerSettingsResp = fetch('/static/viewer/settings.json')
 
 window.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const viewerSettings = await (await viewerSettingsResp).json()
+    console.log("Waiting for window.sse")
+    const sse = await waitForSSE();
+    console.log("window.sse is ready", sse);
+
+    // const viewerSettings = await (await viewerSettingsResp).json()
+    const viewerSettings = sse.settings;
     const position = viewerSettings.camera.position && new Vec3(viewerSettings.camera.position);
     const target = viewerSettings.camera.target && new Vec3(viewerSettings.camera.target);
 
