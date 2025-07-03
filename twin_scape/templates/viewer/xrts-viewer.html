@@ -368,6 +368,20 @@
                 margin-right: 30px;
                 color: black;
             }
+
+            .loader {
+                border: 8px solid #f3f3f3;
+                border-top: 8px solid #3498db;
+                border-radius: 50%;
+                width: 60px;
+                height: 60px;
+                animation: spin 1s linear infinite;
+                margin: auto;
+            }
+            @keyframes spin {
+                0% { transform: rotate(0deg);}
+                100% { transform: rotate(360deg);}
+            }
         </style>
 
         <link rel="stylesheet" href=  "/static/viewer/index.css">
@@ -384,6 +398,7 @@
         </script>
 		
         <script>
+        console.log("=== SCRIPT 1: Inizializzazione variabili ===");
         const title = "{{ title|escapejs }}";
         window.lessonTitle = title.toLowerCase();
 
@@ -398,15 +413,23 @@
         // Debug: stampa corretta
         console.log("annotation: ", annotation);
         console.log("resource: ", resource);
+        console.log("=== FINE SCRIPT 1 ===");
+
         </script>
 
         <script type="module">
+        console.log("=== SCRIPT 2: Fetch dati iniziato ===");
+        console.log("window.sse prima del fetch:", window.sse);
 
 			var  camera, annotations;
             // "http://localhost/static/viewer/conf.json"
 			fetch(`/get_data_from_minio/?resource=${annotation}`)
-				.then(res => res.json())
+				.then(res => {
+                    console.log("=== FETCH: Response ricevuta ===");
+                    return res.json()
+                })
 				.then(config => {
+                    console.log("=== FETCH: Config parsata ===", config);
 					camera = config.camera;
 					annotations = config.annotations;
 					const url = new URL(location.href);
@@ -421,48 +444,78 @@
 							//http://127.0.0.1:5500/xrts-viewer.html?sdata=http://127.0.0.1:5500/koala_stuffie.ply
 						};
 
+                        console.log("=== FETCH: window.sse IMPOSTATO ===", window.sse);
+
+
 						const annotationsContainer = document.getElementsByTagName('pc-scene')[0];
-                        const utilScript = document.createElement('script');
-                        utilScript.type = 'module';
-                        utilScript.src = '/static/viewer/util.js';
-                        document.head.appendChild(utilScript);
+                        // const utilScript = document.createElement('script');
+                        // utilScript.type = 'module';
+                        // utilScript.src = '/static/viewer/util.js';
+                        // document.head.appendChild(utilScript);
+
+                        // console.log("=== FETCH: Caricamento util.js ===");
+                        // utilScript.onload = () => {
+                        //     console.log("=== util.js CARICATO COMPLETAMENTE ===");
+                        // };
+                        // utilScript.onerror = (error) => {
+                        //     console.error("=== ERRORE nel caricamento util.js ===", error);
+                        // };
 							
 				
-							annotations.forEach(annotation => {
-									// Create the <pc-entity> element
-									const pcEntity = document.createElement('pc-entity');
-									pcEntity.setAttribute('name', annotation.id);
-									pcEntity.setAttribute('position', [annotation.position.x, annotation.position.y, annotation.position.z].join(' '));
+                        annotations.forEach(annotation => {
+                                console.log("=== FETCH: Creazione annotazione ===", annotation.id);
+                                // Create the <pc-entity> element
+                                const pcEntity = document.createElement('pc-entity');
+                                pcEntity.setAttribute('name', annotation.id);
+                                pcEntity.setAttribute('position', [annotation.position.x, annotation.position.y, annotation.position.z].join(' '));
 
-									// Create the <pc-scripts> element
-									const pcScripts = document.createElement('pc-scripts');
+                                // Create the <pc-scripts> element
+                                const pcScripts = document.createElement('pc-scripts');
 
-									// Create the <pc-script> element with the annotation script
-									const pcScript = document.createElement('pc-script');
-									pcScript.setAttribute('name', 'annotation');
+                                // Create the <pc-script> element with the annotation script
+                                const pcScript = document.createElement('pc-script');
+                                pcScript.setAttribute('name', 'annotation');
 
-									// Set the attributes for the script (title, text, camera position)
-									const scriptAttributes = {
-                                        annotationData : annotation
-									};
-									pcScript.setAttribute('attributes', JSON.stringify(scriptAttributes));
+                                // Set the attributes for the script (title, text, camera position)
+                                const scriptAttributes = {
+                                    annotationData : annotation
+                                };
+                                pcScript.setAttribute('attributes', JSON.stringify(scriptAttributes));
 
-									// Append <pc-script> to <pc-scripts>, and <pc-scripts> to <pc-entity>
-									pcScripts.appendChild(pcScript);
-									pcEntity.appendChild(pcScripts);
+                                // Append <pc-script> to <pc-scripts>, and <pc-scripts> to <pc-entity>
+                                pcScripts.appendChild(pcScript);
+                                pcEntity.appendChild(pcScripts);
 
-									// Append the <pc-entity> to the scene container
-									annotationsContainer.appendChild(pcEntity);
-								});
+                                // Append the <pc-entity> to the scene container
+                                annotationsContainer.appendChild(pcEntity);
+                            });
 
-				});
+                            console.log("=== FETCH: Tutte le annotazioni create ===");
+                            console.log("=== FINE SCRIPT 2 ===");
+                            document.getElementById('reconnectOverlay').style.display = 'none';
+				})
+                .catch(error => {
+                    console.error("ERRORE FETCH", error)
+                    document.getElementById('reconnectOverlay').style.display = 'flex';
+                    // Reload senza cache dopo un piccolo delay
+                    setTimeout(() => {
+                        const url = new URL(window.location.href);
+                        url.searchParams.set('nocache', Date.now());
+                        window.location.href = url.pathname + url.search;
+                    }, 500);
+                })
 			
-		
+        console.log("=== SCRIPT 2: Fetch avviato (asincrono) ===");
         </script>
 	    <!-- <script type="module" src= " http://localhost/static/viewer/util.js"></script> -->
 		<!-- <script type="module" src="https://cdn.jsdelivr.net/npm/@playcanvas/web-components@0.2.5/dist/pwc.mjs"></script> -->
     </head>
     <body>
+        <div id="reconnectOverlay"
+            style="display:flex;position:fixed;z-index:9999;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.85);color:#222;align-items:center;justify-content:center;font-size:2em;display:flex;flex-direction:column;">
+            <div class="loader"></div>
+            <!-- <div style="font-size:1rem;margin-top:1em;">Riconnessione in corso...</div> -->
+        </div>
         <div id="topbar">
             <img src="/static/viewer/twinscape_logo.png" alt="Twinscape Logo">
             <h2 id="title">{{title}}</h2>
@@ -664,6 +717,19 @@
             </div>
 		
         </div>
+        <script>
+            window.addEventListener('unhandledrejection', async function (e) {
+                // Intercetta solo l'errore specifico su window.sse
+                if (e.reason && e.reason.message && e.reason.message.includes("window.sse")) {
+                    document.getElementById('reconnectOverlay').style.display = 'flex';
+                    await new Promise(resolve => setTimeout(resolve, 500)); // aspetta 2 secondi
+                    // Reload senza cache aggiungendo un parametro random
+                    const url = new URL(window.location.href);
+                    url.searchParams.set('nocache', Date.now());
+                    window.location.href = url.pathname + url.search;
+                }
+            });
+        </script>
 		<script type="module" src="/static/viewer/index.js"></script>
     </body>
 </html>
