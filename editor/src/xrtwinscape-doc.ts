@@ -23,7 +23,7 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                 await events.invoke('showPopup', {
                     type: 'info',
                     header: 'Save',
-                    message: 'Annotations and splat.ply saved and uploaded successfully.'
+                    message: 'Splat saved and uploaded successfully.'
                 });
             }
         } catch (error) {
@@ -56,7 +56,7 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                 await events.invoke('showPopup', {
                     type: 'info',
                     header: 'Save',
-                    message: 'Annotations and splat.ply saved and uploaded successfully.'
+                    message: 'Annotations saved and uploaded successfully.'
                 });
             }
         } catch (error) {
