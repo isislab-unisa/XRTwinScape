@@ -387,7 +387,8 @@
         const resource = title.toLowerCase() + "/splat.ply";
         const annotation = title.toLowerCase() + "/splat.json";
         
-        title = title.split("_")[0];
+        title = title.split("_")[0].replace(/-/g, ' '); // replace underscore and hyphen with space
+        console.log(title)
         // Assegnamento a variabili globali
         window.resourceFromDjango = resource;
         window.annotationFromDjango = annotation;
