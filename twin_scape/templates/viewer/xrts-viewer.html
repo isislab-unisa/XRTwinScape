@@ -381,14 +381,12 @@
         </script>
 		
         <script>
-        let title = "{{ title|escapejs }}";
+        const title = "{{ title|escapejs }}";
 
         // Definizione delle variabili
         const resource = title.toLowerCase() + "/splat.ply";
         const annotation = title.toLowerCase() + "/splat.json";
         
-        title = title.split("_")[0].replace(/-/g, ' '); // replace underscore and hyphen with space
-        console.log(title)
         // Assegnamento a variabili globali
         window.resourceFromDjango = resource;
         window.annotationFromDjango = annotation;
@@ -463,7 +461,7 @@
     <body>
         <div id="topbar">
             <img src="/static/viewer/twinscape_logo.png" alt="Twinscape Logo">
-            <h2 id="title">{{title}}</h2>
+            <h2 id="title">{{title.split("_")[0]}}</h2>
         </div>
         <pc-app antialias="false" depth="false" high-resolution="true" stencil="false">
 			<pc-asset id="camera-controls" src="/static/viewer/camera-controls.mjs" preload></pc-asset>
