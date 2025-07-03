@@ -461,8 +461,7 @@
     <body>
         <div id="topbar">
             <img src="/static/viewer/twinscape_logo.png" alt="Twinscape Logo">
-            {% set first_part = title.split('_')[0] %}
-            <h2 id="title">{{ first_part }}</h2>
+            <h2 id="title">{{title}}</h2>
         </div>
         <pc-app antialias="false" depth="false" high-resolution="true" stencil="false">
 			<pc-asset id="camera-controls" src="/static/viewer/camera-controls.mjs" preload></pc-asset>
