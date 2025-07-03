@@ -323,7 +323,9 @@ export class Annotation extends Script {
                 innerHTML = `<p>${content}</p>`;
                 break;
             case 1: //Image
-                innerHTML = `<img src="${content}" alt="Annotation Image" style="max-width: 300px; max-height: 300px;">`;
+                const imageUrl = `/get_data_from_minio/?resource=${window.lessonTitle}/${content}`;
+                console.log("image url: " + imageUrl);
+                innerHTML = `<img src="${imageUrl}" alt="Annotation Image" style="max-width: 300px; max-height: 300px;">`;
                 break;
             case 2: //Video
                 innerHTML = `<video src="${content}" controls autoplay muted width="320" height="240"></video>`;
