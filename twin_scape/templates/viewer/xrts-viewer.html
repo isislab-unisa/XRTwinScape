@@ -382,7 +382,7 @@
 		
         <script>
         const title = "{{ title|escapejs }}";
-        window.lessonTitle = title;
+        window.lessonTitle = title.toLowerCase();
 
         // Definizione delle variabili
         const resource = title.toLowerCase() + "/splat.ply";
