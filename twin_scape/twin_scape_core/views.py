@@ -57,7 +57,7 @@ def render_xrts_viewer(request):
 @login_required
 @require_http_methods(['GET'])
 def render_annotator(request):
-    return redirect(f"http://localhost:3000/?code={request.GET.get('code')}")
+    return redirect(f"http://xrtwinscape.di.unisa.it:3000/?code={request.GET.get('code')}")
 
 @login_required
 @require_http_methods(['POST'])
