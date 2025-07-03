@@ -133,9 +133,14 @@ class Menu extends Container {
         }]);
 
         const fileMenuPanel = new MenuPanel([{
-            text: localize('file.save'),
-            icon: createSvg(sceneSave),            
-            onSelect: async () => await events.invoke('xrtwinscape.save')
+            text: localize('file.save-splat'),
+            icon: createSvg(sceneSave),
+            onSelect: async () => await events.invoke('xrtwinscape.savesplat')
+        },
+        {
+            text: localize('file.save-annotations'),
+            icon: createSvg(sceneSave),
+            onSelect: async () => await events.invoke('xrtwinscape.saveannotations')
         }, {
             text: localize('file.dashboard'),
             icon: createSvg(sceneImport),

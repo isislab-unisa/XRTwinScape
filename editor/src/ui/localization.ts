@@ -196,6 +196,8 @@ const localizeInit = () => {
                     'file.import': 'Import...',
                     'file.load-all-data': 'Load all PLY data',
                     'file.save': 'Save',
+                    'file.save-splat': 'Save Splat',
+                    'file.save-annotations': 'Save Annotations',
                     'file.save-as': 'Save As...',
                     'file.publish': 'Publish...',
                     'file.export': 'Export',
