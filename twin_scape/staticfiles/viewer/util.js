@@ -76020,8 +76020,29 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                 app.assets.add(asset);
                 app.assets.load(asset);
             };
+
+                // params = getUrlParams();
+                // var poster = params.posterUrl && new Poster(params.posterUrl);
+
+                function waitForSSE() {
+                        return new Promise((resolve) => {
+                                if (window.sse) {
+                                        resolve(window.sse);
+                                        return;
+                                }
+                                const check = () => {
+                                        if (window.sse) {
+                                                resolve(window.sse);
+                                        } else {
+                                                setTimeout(check, 50);
+                                        }
+                                };
+                                check();
+                        });
+                }
             
             document.addEventListener('DOMContentLoaded', async () => {
+                await waitForSSE();
                 const appElement = document.querySelector('pc-app');
                 const app = (await appElement.ready()).app;
             
