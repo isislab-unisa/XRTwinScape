@@ -665,4 +665,4 @@ class Camera extends Element {
     }
 }
 
-export { Camera };
+export { Camera, calcForwardVec };
