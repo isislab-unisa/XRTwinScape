@@ -2,6 +2,8 @@ import { Vec3 } from 'playcanvas';
 
 import { Camera } from './camera';
 
+import { calcForwardVec  } from './camera';
+
 const fromWorldPoint = new Vec3();
 const toWorldPoint = new Vec3();
 const worldDiff = new Vec3();
@@ -19,6 +21,17 @@ class PointerController {
             const azim = camera.azim - dx * camera.scene.config.controls.orbitSensitivity;
             const elev = camera.elevation - dy * camera.scene.config.controls.orbitSensitivity;
             camera.setAzimElev(azim, elev);
+        };
+
+        const simpleRotate = (dx: number, dy: number) => {
+            const euler = camera.entity.getLocalEulerAngles();
+            euler.y -= dx * camera.scene.config.controls.rotateSensitivity;
+            euler.x -= dy * camera.scene.config.controls.rotateSensitivity;
+
+            const forward = new Vec3();
+            calcForwardVec(forward, euler.y, euler.x);
+            const position = camera.entity.getPosition();
+            camera.setPose(position, position.clone().sub(forward), 1);
         };
 
         const pan = (x: number, y: number, dx: number, dy: number) => {
@@ -102,7 +115,8 @@ class PointerController {
                     null;
 
                 if (mod === 'orbit' || (mod === null && buttons[0])) {
-                    orbit(dx, dy);
+                    //orbit(dx, dy);
+                    simpleRotate(dx, dy);
                 } else if (mod === 'zoom' || (mod === null && buttons[1])) {
                     zoom(dy * -0.02);
                 } else if (mod === 'pan' || (mod === null && buttons[2])) {
@@ -115,7 +129,8 @@ class PointerController {
                     const dy = event.offsetY - touch.y;
                     touch.x = event.offsetX;
                     touch.y = event.offsetY;
-                    orbit(dx, dy);
+                    //orbit(dx, dy);
+                    simpleRotate(dx, dy);
                 } else if (touches.length === 2) {
                     const touch = touches[touches.map(t => t.id).indexOf(event.pointerId)];
                     touch.x = event.offsetX;
