@@ -39,6 +39,12 @@ class AnnotationCamera
     target: Vec3;
 }
 
+class BoundingBox
+{
+    position: Vec3;
+    size: Vec3;
+}
+
 class AnnotationContent
 {
     content: any;
@@ -57,6 +63,7 @@ class AnnotationData
     annotations: Annotation[] = [];
     splat: string;
     camera: AnnotationCamera;
+    boundingBox: BoundingBox;
 }
 
-export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}
+export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, AnnotationCamera, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}

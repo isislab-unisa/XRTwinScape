@@ -9,6 +9,8 @@ enum ElementType {
     splat = 'splat',
     shadow = 'shadow',
     debug = 'debug',
+    boundingBox = 'boundingBox',
+    playerCamera = 'playerCamera',
     other = 'other'
 }
 
@@ -18,6 +20,8 @@ const ElementTypeList = [
     ElementType.splat,
     ElementType.shadow,
     ElementType.debug,
+    ElementType.boundingBox,
+    ElementType.playerCamera,
     ElementType.other
 ];
 

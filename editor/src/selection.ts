@@ -1,12 +1,14 @@
 import { Annotation } from './annotation';
 import { Element, ElementType } from './element';
 import { Events } from './events';
+import { PlayerCameraElement } from './playerCameraElement';
 import { Scene } from './scene';
 import { Splat } from './splat';
 
 const registerSelectionEvents = (events: Events, scene: Scene) => {
     let selection: Splat = null;
     let annotationSelected: Annotation = null;
+    let playerCameraSelected: PlayerCameraElement = null;
 
     const setSelection = (splat: Splat, forceChange: boolean) => {
         if ((splat !== selection && (!splat || splat.visible)) || forceChange) {
@@ -45,6 +47,29 @@ const registerSelectionEvents = (events: Events, scene: Scene) => {
 
     events.function('annotationSelection', () => {
         return annotationSelected;
+    });
+
+    const setPlayerCameraSelection = (playerCamera: PlayerCameraElement) => {
+        if (playerCamera !== playerCameraSelected) {
+            console.log('Setting player camera selection to ' + playerCamera);
+            playerCameraSelected = playerCamera;
+            events.fire('playerCamera.selected', Boolean(playerCamera));
+            if(!playerCamera) {
+				// on deselecting the annotation, select the splat
+                const splats = scene.getElementsByType(ElementType.splat) as Splat[];
+                if (splats.length >= 1) {
+                    setSelection(splats[0], true);
+                }
+            }
+        }
+    };
+
+    events.on('playerCamera', (playerCamera: PlayerCameraElement) => {
+        setPlayerCameraSelection(playerCamera);
+    });
+
+    events.function('playerCamera', () => {
+        return playerCameraSelected;
     });
 
     events.on('selection.next', () => {
