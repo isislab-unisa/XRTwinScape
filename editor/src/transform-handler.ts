@@ -1,5 +1,6 @@
 import { Annotation } from './annotation';
 import { AnnotationTransformHandler } from './annotation-transform-handler';
+import { PlayerCameraTransformHandler } from './playerCamera-transform-handler';
 import { EntityTransformHandler } from './entity-transform-handler';
 import { Events } from './events';
 import { registerPivotEvents } from './pivot';
@@ -28,6 +29,7 @@ const registerTransformHandlerEvents = (events: Events) => {
     const entityTransformHandler = new EntityTransformHandler(events);
     const splatsTransformHandler = new SplatsTransformHandler(events);
     const annotationTransformHandler = new AnnotationTransformHandler(events);
+    const playerCameraTransformHandler = new PlayerCameraTransformHandler(events);
 
     const update = (splat: Splat) => {
         if (!splat) {
@@ -52,9 +54,23 @@ const registerTransformHandlerEvents = (events: Events) => {
         }        
     }
 
+    const updatePlayerCamera = (enabled: Boolean) => {
+        console.log('PlayerCameraTransformHandler enabled: ' + enabled);
+        if(enabled)
+        {
+            setTransformHandler(playerCameraTransformHandler);
+        }
+        else
+        {
+            setTransformHandler(null);
+        }   
+    };
+
     events.on('selection.changed', update);
     events.on('splat.stateChanged', update);
-    events.on('annotationList.selectionChanged', updateAnnotation); // TODO fire event on annotationList ui
+    events.on('annotationList.selectionChanged', updateAnnotation);
+    events.on('playerCamera.selected', updatePlayerCamera);
+
 
     registerPivotEvents(events);
 };

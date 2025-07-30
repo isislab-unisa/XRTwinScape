@@ -6,6 +6,7 @@ import { Splat } from '../splat';
 import deleteSvg from './svg/delete.svg';
 import hiddenSvg from './svg/hidden.svg';
 import shownSvg from './svg/shown.svg';
+import { PlayerCameraElement } from 'src/playerCameraElement';
 
 const createSvg = (svgString: string) => {
     const decodedStr = decodeURIComponent(svgString.substring('data:image/svg+xml,'.length));
@@ -153,6 +154,75 @@ class SplatItem extends Container {
     }
 }
 
+class NonSplatItem extends Container {
+    getName: () => string;
+    setName: (value: string) => void;
+    getSelected: () => boolean;
+    setSelected: (value: boolean) => void;
+    getVisible: () => boolean;
+    setVisible: (value: boolean) => void;
+    destroy: () => void;
+
+    constructor(name: string, args = {}) {
+        args = {
+            ...args,
+            class: ['splat-item', 'visible']
+        };
+
+        super(args);
+
+        const text = new Label({
+            class: 'splat-item-text',
+            text: name
+        });
+
+        this.append(text);
+
+        this.getName = () => {
+            return text.value;
+        };
+
+        this.setName = (value: string) => {
+            text.value = value;
+        };
+
+        this.getSelected = () => {
+            return this.class.contains('selected');
+        };
+
+        this.setSelected = (value: boolean) => {
+            if (value !== this.selected) {
+                if (value) {
+                    this.class.add('selected');
+                    this.emit('select', this);
+                } else {
+                    this.class.remove('selected');
+                    this.emit('unselect', this);
+                }
+            }
+        };
+
+    }
+
+    set name(value: string) {
+        this.setName(value);
+    }
+
+    get name() {
+        return this.getName();
+    }
+
+    set selected(value) {
+        this.setSelected(value);
+    }
+
+    get selected() {
+        return this.getSelected();
+    }
+
+}
+
+
 class SplatList extends Container {
     constructor(events: Events, args = {}) {
         args = {
@@ -163,6 +233,8 @@ class SplatList extends Container {
         super(args);
 
         const items = new Map<Splat, SplatItem>();
+        let playerCamera: PlayerCameraElement;
+        let playerCameraItem: NonSplatItem;
 
         events.on('scene.elementAdded', (element: Element) => {
             if (element.type === ElementType.splat) {
@@ -182,6 +254,11 @@ class SplatList extends Container {
                 item.on('invisible', () => {
                     splat.visible = false;
                 });
+            } else if (element.type === ElementType.playerCamera) {
+                console.log('Adding PlayerCameraElement to SplatList');
+                playerCamera = element as PlayerCameraElement;
+                playerCameraItem = new NonSplatItem('Player Camera');                
+                this.append(playerCameraItem);
             }
         });
 
@@ -193,6 +270,10 @@ class SplatList extends Container {
                     this.remove(item);
                     items.delete(splat);
                 }
+            } else if (element.type === ElementType.playerCamera) {
+                playerCamera = null;                
+                this.remove(playerCameraItem);                
+                playerCameraItem = null;
             }
         });
 
@@ -200,6 +281,9 @@ class SplatList extends Container {
             items.forEach((value, key) => {
                 value.selected = key === selection;
             });
+            if (playerCameraItem) {
+                playerCameraItem.selected = false;
+            }
         });
 
         events.on('splat.name', (splat: Splat) => {
@@ -223,6 +307,11 @@ class SplatList extends Container {
                     break;
                 }
             }
+        });
+
+        this.on('clickNonSplat', () => {
+            console.log('NonSplatItem clicked');
+            events.fire('playerCamera', playerCamera);
         });
 
         this.on('removeClicked', async (item: SplatItem) => {
@@ -261,6 +350,11 @@ class SplatList extends Container {
             element.on('removeClicked', () => {
                 this.emit('removeClicked', element);
             });
+        } else if (element instanceof NonSplatItem) {
+            element.on('click', () => {
+                console.log('NonSplatItem clicked on ' + element);
+                this.emit('clickNonSplat');
+            });
         }
     }
 
@@ -268,6 +362,8 @@ class SplatList extends Container {
         if (element instanceof SplatItem) {
             element.unbind('click');
             element.unbind('removeClicked');
+        } else if (element instanceof NonSplatItem) {
+            element.unbind('clickNonSplat');
         }
 
         super._onRemoveChild(element);
