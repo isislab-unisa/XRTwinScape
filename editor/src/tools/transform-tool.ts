@@ -55,7 +55,7 @@ class TransformTool {
 
         events.on('pivot.placed', reattach);
         events.on('pivot.moved', reattach);
-        events.on('selection.changed', reattach);
+        events.on('selection.splatChanged', reattach);
 
         // set the gizmo size to remain a constant size in screen space.
         // called in response to changes in canvas size

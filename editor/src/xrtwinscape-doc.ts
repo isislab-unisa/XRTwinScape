@@ -44,11 +44,6 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
             if (selectedSplat) {
                 // Save annotation data
                 const annotationData: AnnotationData = selectedSplat.annotations;
-                const pose = events.invoke('camera.getPose');
-                annotationData.camera = {
-                    position: pose.position,
-                    target: pose.target
-                };
                 const json = JSON.stringify(annotationData, null, 2);
                 const annotationFile = new File([json], "splat.json", { type: "application/json" });
                 await uploadFile(`${lessonFolder}/splat.json`, annotationFile);

@@ -277,7 +277,7 @@ class DataPanel extends Panel {
             updateHistogram();
         });
 
-        events.on('selection.changed', (selection: Element) => {
+        events.on('selection.splatChanged', (selection: Element) => {
             if (selection instanceof Splat) {
                 splat = selection;
                 populateDataSelector(splat);

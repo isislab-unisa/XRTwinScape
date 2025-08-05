@@ -36,7 +36,7 @@ class Annotation
 class AnnotationCamera
 {
     position: Vec3;
-    target: Vec3;
+    rotation: Quat;
 }
 
 class BoundingBox

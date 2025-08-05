@@ -323,7 +323,7 @@ class ColorPanel extends Container {
             }
         });
 
-        events.on('selection.changed', (splat) => {
+        events.on('selection.splatChanged', (splat) => {
             selected = splat;
             updateUIFromState(splat);
         });

@@ -1,4 +1,4 @@
-import { GSplatData, GSplatResource, BoundingBox, Color, Script, Vec3, MiniStats } from 'playcanvas';
+import { GSplatData, GSplatResource, BoundingBox, Color, Script, Vec3, MiniStats, Quat } from 'playcanvas';
 import { Annotation } from 'annotation'
 
 function waitForSSE() {
@@ -31,7 +31,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // const viewerSettings = await (await viewerSettingsResp).json()
     const viewerSettings = sse.settings;
     const position = viewerSettings.camera.position && new Vec3(viewerSettings.camera.position);
-    const target = viewerSettings.camera.target && new Vec3(viewerSettings.camera.target);
+    const rotation = viewerSettings.camera.rotation && new Quat(viewerSettings.camera.rotation);
+
+    let target = null;
+    if (position && rotation) {
+        let forward = new Vec3();
+        rotation.transformVector(Vec3.FORWARD, forward);
+        target = position.clone().add(forward);
+    }
 
     const appElement = await document.querySelector('pc-app').ready();
     const app = await appElement.app;

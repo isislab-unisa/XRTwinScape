@@ -10,12 +10,10 @@ const registerSelectionEvents = (events: Events, scene: Scene) => {
     let annotationSelected: Annotation = null;
     let playerCameraSelected: PlayerCameraElement = null;
 
-    const setSelection = (splat: Splat, forceChange: boolean) => {
-        if ((splat !== selection && (!splat || splat.visible)) || forceChange) {
-            const prev = selection;
-            selection = splat;
-            events.fire('selection.changed', selection, prev);
-        }
+    const setSelection = (splat: Splat) => {
+        const prev = selection;
+        selection = splat;
+        events.fire('selection.splatChanged', selection, prev);
     };
 
     events.on('selection', (splat: Splat) => {
@@ -50,16 +48,13 @@ const registerSelectionEvents = (events: Events, scene: Scene) => {
     });
 
     const setPlayerCameraSelection = (playerCamera: PlayerCameraElement) => {
-        if (playerCamera !== playerCameraSelected) {
-            console.log('Setting player camera selection to ' + playerCamera);
-            playerCameraSelected = playerCamera;
-            events.fire('playerCamera.selected', Boolean(playerCamera));
-            if(!playerCamera) {
-				// on deselecting the annotation, select the splat
-                const splats = scene.getElementsByType(ElementType.splat) as Splat[];
-                if (splats.length >= 1) {
-                    setSelection(splats[0], true);
-                }
+        playerCameraSelected = playerCamera;
+        events.fire('selection.playerCameraChanged', playerCamera);
+        if(!playerCamera) {
+			// on deselecting the annotation, select the splat
+            const splats = scene.getElementsByType(ElementType.splat) as Splat[];
+            if (splats.length >= 1) {
+                setSelection(splats[0], true);
             }
         }
     };

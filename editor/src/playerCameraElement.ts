@@ -34,47 +34,34 @@ class PlayerCameraElement extends Element {
         this.material.update();
 
         const update = (enabled: Boolean) => {
-            console.log('1');
             this.clearMeshes();
-            console.log('2');
             if(!this.splat || !enabled)
             {
                 return;
             }
-            
-            console.log('3');
             this.playerCamera = this.splat.annotations.camera;
             if(!this.playerCamera)
             {
                 this.playerCamera = new AnnotationCamera();
-                this.playerCamera.position = Vec3.ZERO;
-                this.playerCamera.target = Vec3.FORWARD;
+                this.playerCamera.position = new Vec3(0, 0, 0);
+                this.playerCamera.rotation = new Quat();
+                this.splat.annotations.camera = this.playerCamera;
             }
             const testMesh = Mesh.fromGeometry(this.scene.app.graphicsDevice, new ConeGeometry({ height: 0.1, baseRadius: 0.05, heightSegments: 8 }));
             const newInstance = this.addMesh(testMesh);
             newInstance.node.setPosition(this.playerCamera.position);
-            console.log('4');
-            const cameraPos = this.playerCamera.position;
-            const cameraTarget = this.playerCamera.target;
-            const forward = cameraTarget.clone().sub(cameraPos).normalize();
-            const quat = new Quat();
-            quat.setFromDirections(Vec3.FORWARD, forward);
-            console.log('5');
-            newInstance.node.setRotation(quat);           
-            console.log('6');
+            newInstance.node.setRotation(this.playerCamera.rotation);
             this.scene.debugLayer.addMeshInstances([this.instance], true);
             this.scene.forceRender = true;
-            console.log('7');
         }
 
-        this.scene.events.on('selection.changed', (selection: Splat) => {
+        this.scene.events.on('selection.splatChanged', (selection: Splat) => {
             this.splat = selection;
             update(false);
         });
 
-        this.scene.events.on('playerCamera.selected', (enabled: Boolean) => {
-            console.log('PlayerCameraElement selected: ' + enabled);
-            update(enabled);
+        this.scene.events.on('selection.playerCameraChanged', (camera: PlayerCameraElement) => {
+            update(camera !== null);
         });
 
         this.scene.events.on('playerCamera.moved', () =>{            
@@ -104,11 +91,17 @@ class PlayerCameraElement extends Element {
 
     getPivot(mode: 'center' | 'boundCenter', selection: boolean, result: Transform) {
         const cameraPos = this.playerCamera.position;
-        const cameraTarget = this.playerCamera.target;
-        const forward = cameraTarget.clone().sub(cameraPos).normalize();
-        const cameraQuat = new Quat();
-        cameraQuat.setFromDirections(Vec3.FORWARD, forward);
-        result.set(cameraPos, cameraQuat, Vec3.ONE);
+        const cameraRot = this.playerCamera.rotation;
+        result.set(cameraPos, cameraRot, Vec3.ONE);
+    }
+
+    move(position?: Vec3, rotation?: Quat, scale?: Vec3): void {
+        if (position) {
+            this.playerCamera.position.copy(position);
+        }
+        if (rotation) {
+            this.playerCamera.rotation.copy(rotation);
+        }
     }
 
 }

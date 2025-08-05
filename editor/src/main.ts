@@ -298,13 +298,13 @@ const main = async () => {
                     const annotationsRaw = JSON.parse(jsonText);
                     const annotations = await loadAnnotationDataFromJSON(annotationsRaw);
                     model.annotations = annotations;
-                    events.fire('selection.changed', model);
+                    events.fire('selection.splatChanged', model);
                 }
                 else
                 {
                     model.annotations = new AnnotationData();
                     model.annotations.splat = "splat.ply";
-                    events.fire('selection.changed', model);
+                    events.fire('selection.splatChanged', model);
                 }
             }).catch((err) => {
                 console.error('Failed to load splat.json:', err);

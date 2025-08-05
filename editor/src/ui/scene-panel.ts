@@ -3,6 +3,7 @@ import { Container, Element, Label, NumericInput, TextAreaInput, TextInput } fro
 import { Events } from '../events';
 import { localize } from './localization';
 import { SplatList } from './splat-list';
+import { SceneElements } from './scene-elements';
 import sceneImportSvg from './svg/import.svg';
 import sceneNewSvg from './svg/new.svg';
 import annotationNewSvg from './svg/new annotation.svg';
@@ -87,12 +88,20 @@ class ScenePanel extends Container {
         tooltips.register(sceneNew, 'New Scene', 'top');
         tooltips.register(sceneAnnotationImport, 'Import Annotations', 'top');*/
 
+        /*
         const splatList = new SplatList(events);
 
         const splatListContainer = new Container({
             class: 'splat-list-container'
         });
-        splatListContainer.append(splatList);
+        splatListContainer.append(splatList);*/
+
+        const sceneElements = new SceneElements(events);
+
+        const sceneElementsContainer = new Container({
+            class: 'splat-list-container'
+        });
+        sceneElementsContainer.append(sceneElements);
 
         const transformHeader = new Container({
             class: 'panel-header'
@@ -208,7 +217,8 @@ class ScenePanel extends Container {
         annotationDetailHeader.append(annotationDetailLabel);
         
         this.append(sceneHeader);
-        this.append(splatListContainer);
+        //this.append(splatListContainer);
+        this.append(sceneElementsContainer);
         this.append(transformHeader);
         this.append(new Transform(events));
         this.append(annotationHeader);

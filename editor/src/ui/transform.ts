@@ -180,7 +180,7 @@ class Transform extends Container {
         });
 
         // toggle ui availability based on selection
-        events.on('selection.changed', (selection) => {
+        events.on('selection.splatChanged', (selection) => {
             positionVector.enabled = rotationVector.enabled = scaleInput.enabled = !!selection;
         });
 
