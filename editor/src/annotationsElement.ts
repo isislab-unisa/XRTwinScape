@@ -48,7 +48,7 @@ class AnnotationElement extends Element {
             this.scene.forceRender = true;
         }
 
-        this.scene.events.on('selection.changed', (selection: Splat) => {
+        this.scene.events.on('selection.splatChanged', (selection: Splat) => {
             update(selection);
         });
 

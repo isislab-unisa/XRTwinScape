@@ -43,7 +43,7 @@ class SplatsTransformHandler implements TransformHandler {
             }
         });
 
-        events.on('selection.changed', (splat) => {
+        events.on('selection.splatChanged', (splat) => {
             if (this.splat && splat === this.splat) {
                 this.placePivot();
             }

@@ -312,6 +312,10 @@ class SplatList extends Container {
         this.on('clickNonSplat', () => {
             console.log('NonSplatItem clicked');
             events.fire('playerCamera', playerCamera);
+            events.fire('selection', null, true);
+            if (playerCameraItem) {
+                playerCameraItem.selected = true;
+            }
         });
 
         this.on('removeClicked', async (item: SplatItem) => {

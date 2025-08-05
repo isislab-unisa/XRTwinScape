@@ -1,4 +1,4 @@
-import { JsonHandler, path, Vec3 } from 'playcanvas';
+import { JsonHandler, path, Quat, Vec3 } from 'playcanvas';
 
 import { CreateDropHandler } from './drop-handler';
 import { ElementType } from './element';
@@ -135,6 +135,10 @@ const loadCameraPoses = async (url: string, filename: string, events: Events) =>
 export async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationData> {
     const data = new AnnotationData();
     data.splat = raw.splat;
+    data.camera = raw.camera ? {
+        position: new Vec3(raw.camera.position.x, raw.camera.position.y, raw.camera.position.z),
+        rotation: new Quat(raw.camera.rotation.x, raw.camera.rotation.y, raw.camera.rotation.z, raw.camera.rotation.w)
+    } : null;
 
     for (const ann of raw.annotations) {
         const annotation = new Annotation(ann.id);
@@ -276,7 +280,7 @@ const initFileHandler = (scene: Scene, events: Events, dropTarget: HTMLElement, 
                         if(selectedSplat)
                         {
                             selectedSplat.annotations = annotations;
-                            events.fire('selection.changed', selectedSplat);
+                            events.fire('selection.splatChanged', selectedSplat);
                         }
                     }
                 } catch (err) {

@@ -6,6 +6,7 @@ import { Events } from './events';
 import { registerPivotEvents } from './pivot';
 import { Splat } from './splat';
 import { SplatsTransformHandler } from './splats-transform-handler';
+import { PlayerCameraElement } from './playerCameraElement';
 
 interface TransformHandler {
     activate: () => void;
@@ -54,9 +55,9 @@ const registerTransformHandlerEvents = (events: Events) => {
         }        
     }
 
-    const updatePlayerCamera = (enabled: Boolean) => {
-        console.log('PlayerCameraTransformHandler enabled: ' + enabled);
-        if(enabled)
+    const updatePlayerCamera = (camera: PlayerCameraElement) => {
+        console.log('PlayerCameraTransformHandler enabled: ' + camera);
+        if(camera !== null)
         {
             setTransformHandler(playerCameraTransformHandler);
         }
@@ -66,10 +67,10 @@ const registerTransformHandlerEvents = (events: Events) => {
         }   
     };
 
-    events.on('selection.changed', update);
+    events.on('selection.splatChanged', update);
     events.on('splat.stateChanged', update);
     events.on('annotationList.selectionChanged', updateAnnotation);
-    events.on('playerCamera.selected', updatePlayerCamera);
+    events.on('selection.playerCameraChanged', updatePlayerCamera);
 
 
     registerPivotEvents(events);

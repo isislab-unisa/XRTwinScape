@@ -50,7 +50,6 @@ class PlayerCameraTransformHandler implements TransformHandler {
     }
 
     activate() {
-        console.log('PlayerCameraTransformHandler activated');
         this.playerCamera = this.events.invoke('playerCamera') as PlayerCameraElement;
         if (this.playerCamera) {
             this.placePivot();
@@ -65,14 +64,8 @@ class PlayerCameraTransformHandler implements TransformHandler {
     }
 
     update(transform: Transform) {
-        mat.setTRS(transform.position, transform.rotation, transform.scale);
-        quat.setFromMat4(mat);
-
-        const t = mat.getTranslation();
-        const r = quat;
-        const s = mat.getScale();
-
-        this.playerCamera.move(t, r, s);
+        this.playerCamera.move(transform.position, transform.rotation, transform.scale);
+        this.events.fire('playerCamera.moved', this.playerCamera);
     }
 
     end() {

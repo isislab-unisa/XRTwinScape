@@ -162,7 +162,7 @@ class AnnotationList extends Container
             });
         });
 
-        events.on('selection.changed', (splat: Splat) => {
+        events.on('selection.splatChanged', (splat: Splat) => {
             events.fire('annotationSelection', null);
             for (const [key, value] of items) {
                 events.fire('annotationList.removed', key);

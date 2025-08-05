@@ -75646,7 +75646,7 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                     })();
             
                     // calculate the user camera start position (the pose we'll use if there is no animation)
-                    const useReset = settings.camera.position || settings.camera.target || bbox.halfExtents.length() > 100;
+                    const useReset = settings.camera.position || settings.camera.rotation || bbox.halfExtents.length() > 100;
                     const userStart = new Pose(useReset ? resetPose : framePose);
             
                     // if camera doesn't intersect the scene, assume it's an object we're

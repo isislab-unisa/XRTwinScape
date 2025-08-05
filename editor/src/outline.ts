@@ -37,7 +37,7 @@ class Outline extends Element {
         const layerId = this.scene.overlayLayer.id;
 
         // add selected splat to outline layer
-        this.scene.events.on('selection.changed', (splat: Splat, prev: Splat) => {
+        this.scene.events.on('selection.splatChanged', (splat: Splat, prev: Splat) => {
             if (prev) {
                 prev.entity.gsplat.layers = prev.entity.gsplat.layers.filter(id => id !== layerId);
             }
