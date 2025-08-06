@@ -5,6 +5,7 @@ import { Container, Label, Element as PcuiElement } from 'pcui';
 import { Element, ElementType } from '../element';
 import { Events } from '../events';
 import { Scene } from 'playcanvas';
+import { BoundingBoxElement } from 'src/boundingBoxElement';
 
 class SceneItem extends Container {
     getName: () => string;
@@ -84,16 +85,22 @@ class SceneElements extends Container {
         let splatItem: SceneItem;
         let playerCamera: PlayerCameraElement;
         let playerCameraItem: SceneItem;
+        let boundingBox: BoundingBoxElement;
+        let boundingBoxItem: SceneItem;
 
         events.on('scene.elementAdded', (element: Element) => {
             if (element.type === ElementType.splat) {
                 splat = element as Splat;
-                splatItem = new SceneItem(splat.name);
+                splatItem = new SceneItem("splat");
                 this.append(splatItem);
             } else if (element.type === ElementType.playerCamera) {
                 playerCamera = element as PlayerCameraElement;
                 playerCameraItem = new SceneItem('Player Camera');                
                 this.append(playerCameraItem);
+            } else if (element.type === ElementType.boundingBox) {
+                boundingBox = element as BoundingBoxElement;
+                boundingBoxItem = new SceneItem('Bounding Box');
+                this.append(boundingBoxItem);
             }
         });
 
@@ -106,6 +113,10 @@ class SceneElements extends Container {
                 playerCamera = null;                
                 this.remove(playerCameraItem);                
                 playerCameraItem = null;
+            } else if (element.type === ElementType.boundingBox) {
+                boundingBox = null;
+                this.remove(boundingBoxItem);
+                boundingBoxItem = null;
             }
         });
 
@@ -116,6 +127,10 @@ class SceneElements extends Container {
             if (playerCameraItem) {
                 playerCameraItem.selected = false;
             }
+            if (boundingBoxItem) {
+                boundingBoxItem.selected = false;
+            }
+
         });
 
         events.on('selection.playerCameraChanged', (selection: PlayerCameraElement) => {
@@ -125,9 +140,22 @@ class SceneElements extends Container {
             if (playerCameraItem) {
                 playerCameraItem.selected = (playerCamera === selection);
             }
+            if (boundingBoxItem) {
+                boundingBoxItem.selected = false;
+            }
         });
 
-
+        events.on('selection.boundingBoxChanged', (selection: BoundingBoxElement) => {
+            if (splatItem) {
+                splatItem.selected = false;
+            }
+            if (playerCameraItem) {
+                playerCameraItem.selected = false;
+            }
+            if (boundingBoxItem) {
+                boundingBoxItem.selected = (boundingBox === selection);
+            }
+        });
 
         events.on('splat.name', (splat: Splat) => {
             if (splatItem) {
@@ -138,6 +166,9 @@ class SceneElements extends Container {
         this.on('click', (item: SceneItem) => {
             if(item === playerCameraItem) {
                 events.fire('playerCamera', playerCamera);
+            }
+            else if (item === boundingBoxItem) {
+                events.fire('boundingBox', boundingBox);
             }
             else if (item === splatItem) {
                 events.fire('selection', splat);

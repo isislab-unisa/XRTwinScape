@@ -7,6 +7,8 @@ import { registerPivotEvents } from './pivot';
 import { Splat } from './splat';
 import { SplatsTransformHandler } from './splats-transform-handler';
 import { PlayerCameraElement } from './playerCameraElement';
+import { BoundingBoxElement } from './boundingBoxElement';
+import { BoundingBoxTransformHandler } from './boundingBox-transform-handler';
 
 interface TransformHandler {
     activate: () => void;
@@ -31,6 +33,7 @@ const registerTransformHandlerEvents = (events: Events) => {
     const splatsTransformHandler = new SplatsTransformHandler(events);
     const annotationTransformHandler = new AnnotationTransformHandler(events);
     const playerCameraTransformHandler = new PlayerCameraTransformHandler(events);
+    const boundingBoxTransformHandler = new BoundingBoxTransformHandler(events); // Assuming bounding box uses the same handler as entities
 
     const update = (splat: Splat) => {
         if (!splat) {
@@ -56,7 +59,6 @@ const registerTransformHandlerEvents = (events: Events) => {
     }
 
     const updatePlayerCamera = (camera: PlayerCameraElement) => {
-        console.log('PlayerCameraTransformHandler enabled: ' + camera);
         if(camera !== null)
         {
             setTransformHandler(playerCameraTransformHandler);
@@ -67,11 +69,19 @@ const registerTransformHandlerEvents = (events: Events) => {
         }   
     };
 
+    const updateBoundingBox = (boundingBox: BoundingBoxElement) => {
+        if (boundingBox) {
+            setTransformHandler(boundingBoxTransformHandler);
+        } else {
+            setTransformHandler(null);
+        }
+    };
+
     events.on('selection.splatChanged', update);
     events.on('splat.stateChanged', update);
     events.on('annotationList.selectionChanged', updateAnnotation);
     events.on('selection.playerCameraChanged', updatePlayerCamera);
-
+    events.on('selection.boundingBoxChanged', updateBoundingBox);
 
     registerPivotEvents(events);
 };

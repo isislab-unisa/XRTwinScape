@@ -5,6 +5,7 @@ import { vertexShader, fragmentShader } from './shaders/debug-shader';
 import { Splat } from "./splat";
 import { Transform } from "./transform";
 import { AnnotationCamera } from "./annotation";
+import { BoundingBoxElement } from "./boundingBoxElement";
 
 class PlayerCameraElement extends Element {
     material: ShaderMaterial;
@@ -62,6 +63,10 @@ class PlayerCameraElement extends Element {
 
         this.scene.events.on('selection.playerCameraChanged', (camera: PlayerCameraElement) => {
             update(camera !== null);
+        });
+
+        this.scene.events.on('selection.boundingBoxChanged', (bbox: BoundingBoxElement) => {
+            update(false);
         });
 
         this.scene.events.on('playerCamera.moved', () =>{            
