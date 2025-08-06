@@ -26,6 +26,7 @@ import { SplatOverlay } from './splat-overlay';
 import { Underlay } from './underlay';
 import { AnnotationElement } from './annotationsElement';
 import { PlayerCameraElement } from './playerCameraElement';
+import { BoundingBoxElement } from './boundingBoxElement';
 
 class Scene {
     events: Events;
@@ -219,7 +220,7 @@ class Scene {
 
         this.add(new AnnotationElement());
         this.add(new PlayerCameraElement());
-
+        this.add(new BoundingBoxElement());
     }
 
     start() {

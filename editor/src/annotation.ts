@@ -42,6 +42,7 @@ class AnnotationCamera
 class BoundingBox
 {
     position: Vec3;
+    rotation: Quat;
     size: Vec3;
 }
 
@@ -66,4 +67,4 @@ class AnnotationData
     boundingBox: BoundingBox;
 }
 
-export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, AnnotationCamera, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}
+export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, AnnotationCamera, BoundingBox, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}

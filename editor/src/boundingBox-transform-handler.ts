@@ -2,37 +2,37 @@ import { TransformHandler } from "./transform-handler";
 import { Events } from "./events";
 import { Pivot } from "./pivot";
 import { Transform } from "./transform";
-import { PlayerCameraElement } from "./playerCameraElement";
+import { BoundingBoxElement } from "./boundingBoxElement";
 
 const transform = new Transform();
 
-class PlayerCameraTransformHandler implements TransformHandler {
+class BoundingBoxTransformHandler implements TransformHandler {
     events: Events;
-    playerCamera: PlayerCameraElement;
+    boundingBox: BoundingBoxElement;
 
     constructor(events: Events) {
         this.events = events;
 
         events.on('pivot.started', (pivot: Pivot) => {
-            if (this.playerCamera) {
+            if (this.boundingBox) {
                 this.start();
             }
         });
 
         events.on('pivot.moved', (pivot: Pivot) => {
-            if (this.playerCamera) {
+            if (this.boundingBox) {
                 this.update(pivot.transform);
             }
         });
 
         events.on('pivot.ended', (pivot: Pivot) => {
-            if (this.playerCamera) {
+            if (this.boundingBox) {
                 this.end();
             }
         });
 
         events.on('pivot.origin', (mode: 'center' | 'boundCenter') => {
-            if (this.playerCamera) {
+            if (this.boundingBox) {
                 this.placePivot();
             }
         });
@@ -42,31 +42,31 @@ class PlayerCameraTransformHandler implements TransformHandler {
     placePivot() {
         // place initial pivot point
         const origin = this.events.invoke('pivot.origin');
-        this.playerCamera.getPivot(origin === 'center' ? 'center' : 'boundCenter', false, transform);
+        this.boundingBox.getPivot(origin === 'center' ? 'center' : 'boundCenter', false, transform);
         this.events.fire('pivot.place', transform);
     }
 
     activate() {
-        this.playerCamera = this.events.invoke('playerCamera') as PlayerCameraElement;
-        if (this.playerCamera) {
+        this.boundingBox = this.events.invoke('boundingBox') as BoundingBoxElement;
+        if (this.boundingBox) {
             this.placePivot();
         }
     }
 
     deactivate() {
-        this.playerCamera = null;
+        this.boundingBox = null;
     }
 
     start() {
     }
 
     update(transform: Transform) {
-        this.playerCamera.move(transform.position, transform.rotation, transform.scale);
-        this.events.fire('playerCamera.moved', this.playerCamera);
+        this.boundingBox.move(transform.position, transform.rotation, transform.scale);
+        this.events.fire('boundingBox.moved', this.boundingBox);
     }
 
     end() {
     }
 }
 
-export { PlayerCameraTransformHandler }
+export { BoundingBoxTransformHandler }

@@ -421,7 +421,7 @@
         console.log("=== SCRIPT 2: Fetch dati iniziato ===");
         console.log("window.sse prima del fetch:", window.sse);
 
-			var  camera, annotations;
+			var  camera, annotations, boundingBox;
             // "http://localhost/static/viewer/conf.json"
 			fetch(`/get_data_from_minio/?resource=${annotation}`)
 				.then(res => {
@@ -432,6 +432,7 @@
                     console.log("=== FETCH: Config parsata ===", config);
 					camera = config.camera;
 					annotations = config.annotations;
+                    boundingBox = config.boundingBox;
 					const url = new URL(location.href);
 					// const resource = "pcpc_2_pcpc.ply"
                     
@@ -439,6 +440,9 @@
 					window.sse = {
 							settings: {"camera":{"fov":50,"position":[camera.position.x, camera.position.y, camera.position.z],
 							"rotation":[camera.rotation.x, camera.rotation.y, camera.rotation.z, camera.rotation.w],"startAnim":"none","animTrack":null},
+                            "boundingBox":{"position":[boundingBox.position.x, boundingBox.position.y, boundingBox.position.z],
+                            "rotation":[boundingBox.rotation.x, boundingBox.rotation.y, boundingBox.rotation.z, boundingBox.rotation.w], 
+                            "halfExtents":[boundingBox.size.x, boundingBox.size.y, boundingBox.size.z]},
 							"background":{"color":[0.4,0.4,0.4]},"animTracks":[]},
 							contentUrl: `/get_data_from_minio/?resource=${resource}`,
 							//http://127.0.0.1:5500/xrts-viewer.html?sdata=http://127.0.0.1:5500/koala_stuffie.ply

@@ -32,6 +32,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const viewerSettings = sse.settings;
     const position = viewerSettings.camera.position && new Vec3(viewerSettings.camera.position);
     const rotation = viewerSettings.camera.rotation && new Quat(viewerSettings.camera.rotation);
+    const boundingBoxPosition = viewerSettings.boundingBox.position && new Vec3(viewerSettings.boundingBox.position);
+    const boundingBoxRotation = viewerSettings.boundingBox.rotation && new Quat(viewerSettings.boundingBox.rotation);
+    const boundingBoxSize = viewerSettings.boundingBox.halfExtents && new Vec3(viewerSettings.boundingBox.halfExtents);
+    console.log("BoundingBox", boundingBoxPosition, boundingBoxRotation, boundingBoxSize);
+    // TODO make sure that camera is always inside the bounding box
+    // TODO fix camera to look to target properly
 
     let target = null;
     if (position && rotation) {

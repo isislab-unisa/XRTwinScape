@@ -139,6 +139,11 @@ export async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationDa
         position: new Vec3(raw.camera.position.x, raw.camera.position.y, raw.camera.position.z),
         rotation: new Quat(raw.camera.rotation.x, raw.camera.rotation.y, raw.camera.rotation.z, raw.camera.rotation.w)
     } : null;
+    data.boundingBox = raw.boundingBox ? {
+        position: new Vec3(raw.boundingBox.position.x, raw.boundingBox.position.y, raw.boundingBox.position.z),
+        rotation: new Quat(raw.boundingBox.rotation.x, raw.boundingBox.rotation.y, raw.boundingBox.rotation.z, raw.boundingBox.rotation.w),
+        size: new Vec3(raw.boundingBox.size.x, raw.boundingBox.size.y, raw.boundingBox.size.z)
+    } : null;
 
     for (const ann of raw.annotations) {
         const annotation = new Annotation(ann.id);
