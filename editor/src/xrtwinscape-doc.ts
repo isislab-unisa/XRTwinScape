@@ -6,6 +6,7 @@ import { AnnotationData } from "./annotation";
 import { Splat } from "./splat";
 import { BufferWriter } from "./serialize/writer";
 import { serializePly } from "./splat-serialize";
+import { testToken, onLogin } from "./keycloakAuth.js";
 
 const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
     events.function('xrtwinscape.savesplat', async () => {
@@ -75,7 +76,9 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
 
     events.function('xrtwinscape.publish', async () => {
         // TODO call XR2Learn Marketplace API to publish the lesson
+        await testToken();
     });
+    
 }
 
 export { registerXRTwinScapeEvents };
