@@ -74615,6 +74615,12 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                 moveSpeed = 0.1;
             
                 rotateSpeed = 0.2;
+
+                bboxPosition = new Vec3();
+                
+                bboxRotation = new Quat();
+
+                bboxHalfExtents = new Vec3();
             
                 reset(pose, snap = true) {
                     this.position.copy(pose.position);
@@ -74634,7 +74640,7 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                 }
             
                 move(input) {
-                    const { position, rotation, moveSpeed, rotateSpeed } = this;
+                    const { position, rotation, moveSpeed, rotateSpeed, bboxPosition, bboxRotation, bboxHalfExtents } = this;
             
                     // get camera vectors
                     rotation.transformVector(Vec3.FORWARD, forward$1);
@@ -74650,6 +74656,35 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
             
                     v$3.copy(forward$1).mulScalar(input.move.value[1] * -moveSpeed);
                     position.add(v$3);
+
+                    if (bboxPosition && bboxRotation && bboxHalfExtents) {
+                        // Transform position into bbox local space
+                        const localPos = position.clone().sub(bboxPosition);
+                        const invRot = bboxRotation.clone().invert();
+                        invRot.transformVector(localPos, localPos);
+
+                        // Calculate the two main axes of the OBB: X and Z (Y is up)
+                        const axisX = new Vec3(1, 0, 0);
+                        const axisZ = new Vec3(0, 0, 1);
+
+                        // Project localPos onto the two axes
+                        const xProj = localPos.dot(axisX);
+                        const zProj = localPos.dot(axisZ);
+
+                        // Clamp projections to half extents
+                        const clampedX = Math.max(-bboxHalfExtents.x, Math.min(bboxHalfExtents.x, xProj));
+                        const clampedZ = Math.max(-bboxHalfExtents.z, Math.min(bboxHalfExtents.z, zProj));
+
+                        // Reconstruct the clamped position in local space
+                        localPos.x = clampedX;
+                        // y is up, clamp as usual
+                        localPos.y = Math.max(-bboxHalfExtents.y, Math.min(bboxHalfExtents.y, localPos.y));
+                        localPos.z = clampedZ;
+
+                        // Transform back to world space
+                        bboxRotation.transformVector(localPos, localPos);
+                        position.copy(bboxPosition).add(localPos);
+                    }
             
                     // rotate
                     q$1.setFromAxisAngle(right$1, -input.rotate.value[1] * rotateSpeed);
@@ -75098,7 +75133,6 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                                     break;
                                 case 'forward':
                                 case 'backward':
-                                    console.log("forward")
                                     leftKeys.target[1] = (controls.forward ? -moveSpeed : 0) + (controls.backward ? moveSpeed : 0);
                                     break;
                                 case 'up':
@@ -75675,6 +75709,10 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
             
                     // set fly speed based on scene size, within reason
                     flyCamera.moveSpeed = Math.max(0.05, Math.min(1, bbox.halfExtents.length() * 0.0001));
+
+                    flyCamera.bboxPosition = new Vec3(settings.boundingBox.position);
+                    flyCamera.bboxRotation = new Quat(settings.boundingBox.rotation);
+                    flyCamera.bboxHalfExtents = new Vec3(settings.boundingBox.halfExtents);
             
                     // set the global animation flag
                     state.hasAnimation = !!animCamera;
