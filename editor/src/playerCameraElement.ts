@@ -51,7 +51,9 @@ class PlayerCameraElement extends Element {
             const testMesh = Mesh.fromGeometry(this.scene.app.graphicsDevice, new ConeGeometry({ height: 0.1, baseRadius: 0.05, heightSegments: 8 }));
             const newInstance = this.addMesh(testMesh);
             newInstance.node.setPosition(this.playerCamera.position);
-            newInstance.node.setRotation(this.playerCamera.rotation);
+            const rot = this.playerCamera.rotation.clone();
+            rot.mul(new Quat().setFromEulerAngles(-90, -180, 0)); // rotate the cone to point the base towards the forward
+            newInstance.node.setRotation(rot);
             this.scene.debugLayer.addMeshInstances([this.instance], true);
             this.scene.forceRender = true;
         }

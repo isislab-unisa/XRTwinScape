@@ -75486,6 +75486,13 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                     this.events = events;
                     this.state = state;
                     this.settings = settings;
+                    const position = new Vec3(camera.position);
+                    const rotation = new Quat(camera.rotation);
+                    let target = null;
+                    let forward = new Vec3();
+                    rotation.transformVector(Vec3.FORWARD, forward);
+                    target = position.clone().add(forward);
+                    this.settings.camera.target = [target.x, target.y, target.z];
             
                     // disable auto render, we'll render only when camera changes
                     app.autoRender = false;
