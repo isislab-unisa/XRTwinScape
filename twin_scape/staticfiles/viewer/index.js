@@ -49,10 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const appElement = await document.querySelector('pc-app').ready();
     const app = await appElement.app;
 
-    const entityElement = await document.querySelector('pc-entity[name="camera"]').ready();
-    const entity = entityElement.entity;
-        
-
     class FrameScene extends Script {
         resetCamera(bbox) {
             this.entity.script.cameraControls.focus(target, position);
