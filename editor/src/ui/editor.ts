@@ -22,6 +22,7 @@ import { ViewCube } from './view-cube';
 import { ViewPanel } from './view-panel';
 import { ViewerExportPopup } from './viewer-export-popup';
 import { version } from '../../package.json';
+import { XR2LearnPublishDialog } from './xr2learn-publish-dialog';
 
 class EditorUI {
     appContainer: Container;
@@ -169,10 +170,14 @@ class EditorUI {
         // video settings
         const videoSettingsDialog = new VideoSettingsDialog(events);
 
+        // xr2learn publish
+        const xr2learnPublishDialog = new XR2LearnPublishDialog(events);
+
         topContainer.append(popup);
         topContainer.append(viewerExportPopup);
         topContainer.append(publishSettingsDialog);
         topContainer.append(videoSettingsDialog);
+        topContainer.append(xr2learnPublishDialog);
 
         appContainer.append(editorContainer);
         appContainer.append(topContainer);
@@ -223,6 +228,14 @@ class EditorUI {
 
             if (videoSettings) {
                 await events.invoke('render.video', videoSettings);
+            }
+        });
+
+        events.function('show.xr2learnPublishDialog', async () => {
+            const lessonAsset = await xr2learnPublishDialog.show();
+            if(lessonAsset)
+            {
+                await events.invoke('xr2learn.publish', lessonAsset);
             }
         });
 

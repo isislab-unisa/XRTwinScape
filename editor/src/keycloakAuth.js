@@ -68,19 +68,57 @@ keycloak.onAuthSuccess = function () {
     startTokenRefresh();
 };
 
-export async function testToken() {
+export async function authenticateKeycloak() {
     await keycloak.init({
         onLoad: 'login-required',
-        checkLoginIframe: false
+        checkLoginIframe: false        
     });
+}
 
-    onLogin();
+export async function testToken() {
+    const curToken = localStorage.getItem("kc_token");
+    console.log("Current token from localStorage:", curToken);
+    if(!curToken)
+    {
+        const authenticated = await keycloak.init({
+            onLoad: 'login-required',
+            checkLoginIframe: false
+        });
 
-/*    try {
+        if(authenticated)
+        {
+            console.log("User is authenticated");
+        }
+        else
+        {
+            console.log("User is not authenticated");
+        }
+    }
+    else
+    {
+        const authenticated = await keycloak.init({
+            onLoad: 'login-required',
+            token: curToken,
+            checkLoginIframe: false
+        });
+
+        if(authenticated)
+        {
+            console.log("User is authenticated");
+        }
+        else
+        {
+            console.log("User is not authenticated");
+        }
+    }
+
+    //onLogin();
+
+    try {
         await keycloak.updateToken(30);
         const token = keycloak.token;
         console.log("Token refreshed:", token);
     } catch (error) {
         console.error('Failed to refresh token:', error);
-    }*/
+    }
 }
