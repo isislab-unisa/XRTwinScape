@@ -102,6 +102,7 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
         if(curToken)
         {
             try {
+                events.fire('startSpinner');
                 const marketplaceURL = "https://marketplace-api.xr2learn-marketplace.eu/";
                 const response = await fetch(`${marketplaceURL}source`, {
                     method: 'POST',
@@ -146,8 +147,8 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                 formData.append('source', sourceResponse.id);
 
                 // Disabled for server-side error
-                /*const imageBlob = await fetch(lessonAsset.image).then(r => r.blob());
-                formData.append('display_image', imageBlob, 'image.png');*/
+                const imageBlob = await fetch(lessonAsset.image).then(r => r.blob());
+                formData.append('display_image', imageBlob, 'image.png');
 
                 const marketplaceItemResponse = await fetch(`${marketplaceURL}marketplace-item/`, {
                     method: 'POST',
@@ -162,10 +163,17 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                     throw new Error(`Failed to create marketplace item: ${marketplaceItemResponse.statusText}`);
                 }
 
+                const itemResponse = await marketplaceItemResponse.json();
+                const itemId = itemResponse?.item?.id;
+                const itemUrl = itemId
+                    ? `https://xr2learn-marketplace.eu/marketplace/${itemId}`
+                    : null;
+
                 await events.invoke('showPopup', {
                     type: 'info',
                     header: 'Success',
-                    message: 'Lesson published successfully to XR2Learn Marketplace.'
+                    message: 'Lesson published successfully to XR2Learn Marketplace.',
+                    link: itemUrl
                 });
 
             } catch (error) {
@@ -174,6 +182,8 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
                     header: 'Publish Failed',
                     message: error.message || String(error)
                 });
+            } finally {
+                events.fire('stopSpinner');
             }
         }
         else
