@@ -145,19 +145,11 @@ class XR2LearnPublishDialog extends Container {
                         return;
                     }
 
-                    const imageResponse = await fetch(imageURL);
-                    const imageBlob = await imageResponse.blob();
-                    const base64Image = await new Promise<string>((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result as string);
-                        reader.readAsDataURL(imageBlob);
-                    });
-
                     const lessonAsset = {
                         name: nameTextInput.value,
                         description: descriptionTextInput.value,
                         tags: tagsTextInput.value.split(',').map(tag => tag.trim()),
-                        image: base64Image
+                        image: imageURL
                     };
                     resolve(lessonAsset)
                 };

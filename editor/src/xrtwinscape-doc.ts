@@ -91,111 +91,137 @@ const registerXRTwinScapeEvents = (scene: Scene, events: Events) => {
         });
 
         if (result.action === 'yes') {
-            await authenticateKeycloak();
             events.invoke('show.xr2learnPublishDialog');
         }
     });
 
-    events.function('xr2learn.publish', async (lessonAsset: LessonAsset) => {
-        console.log("Publishing lesson:", lessonAsset);
-        const curToken = localStorage.getItem("kc_token");
-        if(curToken)
-        {
-            try {
-                events.fire('startSpinner');
-                const marketplaceURL = "https://marketplace-api.xr2learn-marketplace.eu/";
-                const response = await fetch(`${marketplaceURL}source`, {
-                    method: 'POST',
-                    headers: {
-                    'Authorization': `Bearer ${curToken}`,
-                    'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                    type: 'software',
-                    media: window.location.href
-                    })
-                });
+    async function publishToMarketplace(curToken: string, lessonAsset: LessonAsset, events: Events): Promise<void> {
+        
+        const marketplaceURL = "https://marketplace-api.xr2learn-marketplace.eu/";
+        const response = await fetch(`${marketplaceURL}source`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${curToken}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'software',
+                media: window.location.href
+            })
+        });
 
-                if (!response.ok) {
-                    throw new Error(`Failed to publish: ${response.statusText}`);
-                }
-
-                const sourceResponse = await response.json();
-                const userResponse = await fetch(`${marketplaceURL}user`, {
-                    method: 'GET',
-                    headers: {
-                    'Authorization': `Bearer ${curToken}`,
-                    'Content-Type': 'application/json'
-                    }
-                });
-
-                if (!userResponse.ok) {
-                    throw new Error(`Failed to fetch user data: ${userResponse.statusText}`);
-                }
-
-                const userData = await userResponse.json();
-                const userId = userData.id;
-
-                // Create form data
-                const formData = new FormData();
-                formData.append('name', lessonAsset.name);
-                formData.append('description', lessonAsset.description);
-                formData.append('type', 'software');
-                formData.append('owner', userId);
-                formData.append('tags', JSON.stringify(lessonAsset.tags || []));
-                formData.append('external_link', window.location.href);
-                formData.append('source', sourceResponse.id);
-
-                // Disabled for server-side error
-                const imageBlob = await fetch(lessonAsset.image).then(r => r.blob());
-                formData.append('display_image', imageBlob, 'image.png');
-
-                const marketplaceItemResponse = await fetch(`${marketplaceURL}marketplace-item/`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${curToken}`,
-                        'Content-Type': 'multipart/form-data; boundary=----geckoformboundary'
-                    },
-                    body: formData
-                });
-
-                if (!marketplaceItemResponse.ok) {
-                    throw new Error(`Failed to create marketplace item: ${marketplaceItemResponse.statusText}`);
-                }
-
-                const itemResponse = await marketplaceItemResponse.json();
-                const itemId = itemResponse?.item?.id;
-                const itemUrl = itemId
-                    ? `https://xr2learn-marketplace.eu/marketplace/${itemId}`
-                    : null;
-
-                await events.invoke('showPopup', {
-                    type: 'info',
-                    header: 'Success',
-                    message: 'Lesson published successfully to XR2Learn Marketplace.',
-                    link: itemUrl
-                });
-
-            } catch (error) {
-                await events.invoke('showPopup', {
-                    type: 'error',
-                    header: 'Publish Failed',
-                    message: error.message || String(error)
-                });
-            } finally {
-                events.fire('stopSpinner');
-            }
+        if (!response.ok) {
+            throw new Error(`Failed to publish: ${response.statusText}`);
         }
-        else
-        {
+
+        const sourceResponse = await response.json();
+        const userResponse = await fetch(`${marketplaceURL}user`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${curToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!userResponse.ok) {
+            throw new Error(`Failed to fetch user data: ${userResponse.statusText}`);
+        }
+
+        const userData = await userResponse.json();
+        const userId = userData.id;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('name', lessonAsset.name);
+        formData.append('description', lessonAsset.description);
+        formData.append('type', 'software');
+        formData.append('owner', userId);
+        formData.append('tags', JSON.stringify(lessonAsset.tags || []));
+        formData.append('external_link', window.location.href);
+        formData.append('source', sourceResponse.id);
+
+        // Disabled for server-side error
+        const imageBlob = await fetch(lessonAsset.image).then(r => r.blob());
+        formData.append('display_image', imageBlob, 'image.png');
+
+        const marketplaceItemResponse = await fetch(`${marketplaceURL}marketplace-item/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${curToken}`,
+                'Content-Type': 'multipart/form-data; boundary=----geckoformboundary'
+            },
+            body: formData
+        });
+
+        if (!marketplaceItemResponse.ok) {
+            throw new Error(`Failed to create marketplace item: ${marketplaceItemResponse.statusText}`);
+        }
+
+        const itemResponse = await marketplaceItemResponse.json();
+        const itemId = itemResponse?.item?.id;
+        const itemUrl = itemId
+            ? `https://xr2learn-marketplace.eu/marketplace/${itemId}`
+            : null;
+
+        await events.invoke('showPopup', {
+            type: 'info',
+            header: 'Success',
+            message: 'Lesson published successfully to XR2Learn Marketplace.',
+            link: itemUrl
+        });
+   
+    }
+    
+    async function handlePublishing(lessonAsset: LessonAsset, events: Events) {
+        const curToken = localStorage.getItem("kc_token");
+        if (!curToken) {
             await events.invoke('showPopup', {
                 type: 'error',
-                header: 'Authentication Error',
+                header: 'Token Error',
                 message: 'No valid token found. Please log in and try again.'
             });
+            return;
         }
+
+        try {
+            events.fire('startSpinner');
+            await publishToMarketplace(curToken, lessonAsset, events);
+        } catch (error) {
+            await events.invoke('showPopup', {
+                type: 'error',
+                header: 'Publish Failed',
+                message: error.message || String(error)
+            });
+        } finally {
+            localStorage.removeItem("lessonAsset");
+            events.fire('stopSpinner');
+        }
+    }
+
+    events.function('xr2learn.publish', async (lessonAsset: LessonAsset) => {
+        console.log("Publishing lesson:", lessonAsset);
+        localStorage.setItem("lessonAsset", JSON.stringify(lessonAsset));
+        try
+        {
+            await authenticateKeycloak();
+        }
+        finally {
+            localStorage.removeItem("lessonAsset");
+        }
+        await handlePublishing(lessonAsset, events);
     });
 
+    events.on('scene.elementAdded', async (element: Element) => {
+        if (element.type === ElementType.splat) {            
+            const lessonAssetStr = localStorage.getItem("lessonAsset");
+            if (lessonAssetStr) {
+                const lessonAsset = JSON.parse(lessonAssetStr);
+                console.log("Publishing lesson:", lessonAsset);
+                await authenticateKeycloak();                
+                await handlePublishing(lessonAsset, events);
+            }
+        }
+    });
 }
 
 export { registerXRTwinScapeEvents, LessonAsset };

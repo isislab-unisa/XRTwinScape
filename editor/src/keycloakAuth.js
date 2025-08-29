@@ -1,6 +1,7 @@
 import Keycloak from "keycloak-js";
 import { constants } from "./const/variables";
 let isRefreshing = false;
+let authenticated = false;
 
 export const keycloak = new Keycloak({
     url: constants.AUTH_URL,
@@ -69,10 +70,29 @@ keycloak.onAuthSuccess = function () {
 };
 
 export async function authenticateKeycloak() {
-    await keycloak.init({
-        onLoad: 'login-required',
-        checkLoginIframe: false        
-    });
+    if(!authenticated)
+    {
+        authenticated = await keycloak.init({
+            onLoad: 'login-required',
+            checkLoginIframe: false
+        });
+    }
+
+    if(authenticated)
+    {
+        try {
+            await keycloak.updateToken(30);
+            localStorage.setItem("kc_token", keycloak.token);
+            console.log("Token refreshed:", keycloak.token);
+        } catch (error) {
+            console.error('Failed to refresh token:', error);
+        }
+    }
+    else
+    {
+        console.error("User is not authenticated");
+    }
+    return authenticated;
 }
 
 export async function testToken() {
