@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import pick_data_from_minio, render_xrts_viewer, build, complete_build, get_images, get_data_from_minio, delete_data_on_minio, upload_data_on_minio
+from .views import pick_data_from_minio, render_xrts_viewer, build, complete_build, get_images, get_data_from_minio, delete_data_on_minio, upload_data_on_minio, get_lessons
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.views.decorators.cache import never_cache
 
@@ -15,4 +15,5 @@ urlpatterns = [
     path('get_data_from_minio/', get_data_from_minio, name='get_data_from_minio'),
     path('delete_data_on_minio/', delete_data_on_minio, name='delete_data_on_minio'),
     path('upload_data_on_minio/', upload_data_on_minio, name='upload_data_on_minio'),
+    path('get_lessons/', get_lessons, name='get_lessons')
 ]

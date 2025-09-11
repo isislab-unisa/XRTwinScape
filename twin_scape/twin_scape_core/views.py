@@ -21,6 +21,7 @@ from rest_framework.response import Response
 import json
 from django.core.files.base import ContentFile
 from django.views.decorators.cache import never_cache
+from .serializers import LessonSerializer
 
 # Redis client
 redis_client = redis.StrictRedis.from_url(os.getenv("REDIS_URL", "redis://localhost:6379"))
@@ -198,3 +199,11 @@ def upload_data_on_minio(request):
     storage.save(resource, uploaded_file)
 
     return JsonResponse({"message": "File uploaded successfully"}, status=200)
+
+@api_view(['GET'])
+@authentication_classes([])
+@permission_classes([AllowAny])
+def get_lessons(request):
+    lessons = Lesson.objects.all()
+    serializer = LessonSerializer(lessons, many=True)
+    return Response({"lessons": serializer.data})

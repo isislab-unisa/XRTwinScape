@@ -74,7 +74,7 @@ services:
       - web
 
   minio:
-    image: minio/minio
+    image: minio/minio@sha256:a1ea29fa28355559ef137d71fc570e508a214ec84ff8083e39bc5428980b015e
     container_name: minio
     environment:
       MINIO_ROOT_USER: ${MINIO_ROOT_USER}
@@ -102,20 +102,20 @@ services:
       /usr/bin/mc policy set none myminio/lessons-media || true;
       '
     
-  full_gaussian_pipe:
-    image: atermoros/nerfstudio-mast3r:latest
-    container_name: full_gaussian_pipe
-    environment:
-      - PYTHONUNBUFFERED=1
-    env_file:
-      - .env
-    # gpus: all
-    user: root
-    shm_size: "48g"	
-    ports:
-      - "8090:8090"
-    volumes:
-      - ./full_gaussian_pipe:/workspace
+  # full_gaussian_pipe:
+  #   image: atermoros/nerfstudio-mast3r:latest
+  #   container_name: full_gaussian_pipe
+  #   environment:
+  #     - PYTHONUNBUFFERED=1
+  #   env_file:
+  #     - .env
+  #   # gpus: all
+  #   user: root
+  #   shm_size: "48g"	
+  #   ports:
+  #     - "8090:8090"
+  #   volumes:
+  #     - ./full_gaussian_pipe:/workspace
 
   editor:
     container_name: xrtwinscape-editor
