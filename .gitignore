@@ -3,3 +3,4 @@
 migrations/*
 !migrations/__init__.py
 __pycache__/
+/twin_scape/certbot/conf/accounts
