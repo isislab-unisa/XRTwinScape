@@ -20,7 +20,7 @@ def run_command(command):
 
 def full_pipe(video_path, frame_output_dir, frame_count, skip_colmap=False,
               max_num_iterations=30000, start_over=False, only_nerfstudio=False,
-              nerfstudio_model="splatfacto", advanced_training=False, use_mcmc=False, num_downscales=8):
+              nerfstudio_model="splatfacto", advanced_training=False, use_mcmc=False, num_downscales=8, dataparser_scale=None):
     
     frame_extract_start_time = time.time()
     print("Starting full pipeline...")
@@ -120,11 +120,12 @@ def full_pipe(video_path, frame_output_dir, frame_count, skip_colmap=False,
         frame_output_dir,
         "--output_dir",
         mast3r_output_dir,
+        "--shared_intrinsics",
         "--scenegraph_type",
         "swin",
         "--winsize",
         str(20),
-        "--win_cyclic",
+        # "--win_cyclic",
     ]
     if skip_mast3r_processing is False and only_nerfstudio is False:
         mast3r_start_time = time.time()
@@ -183,6 +184,10 @@ def full_pipe(video_path, frame_output_dir, frame_count, skip_colmap=False,
        
     nerfstudio_cmd.append("--num-downscales")
     nerfstudio_cmd.append(str(num_downscales))
+    
+    if dataparser_scale is not None:
+        nerfstudio_cmd.append("--dataparser-scale")
+        nerfstudio_cmd.append(str(dataparser_scale))
      
     if advanced_training:
         nerfstudio_cmd.append("--advanced")
@@ -255,6 +260,12 @@ def main():
         default=8,
         choices=[1, 2, 4, 8],
         help="Number of downscales for processing.",
+    )
+    parser.add_argument(
+        "--dataparser-scale",
+        type=float,
+        default=None,
+        help="Scale factor for the dataparser (e.g., 1, 2, 4, 8). If not set, defaults to nerfstudio's choice.",
     )
     args = parser.parse_args()
 
