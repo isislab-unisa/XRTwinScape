@@ -199,7 +199,7 @@ class ScenePanel extends Container {
         });
         annotationListContainer.append(annotationList);  
 
-        const annotationDetailHeader = new Container({
+/*        const annotationDetailHeader = new Container({
             class: 'panel-header'
         });
 
@@ -214,7 +214,7 @@ class ScenePanel extends Container {
         });
 
         annotationDetailHeader.append(annotationDetailIcon);
-        annotationDetailHeader.append(annotationDetailLabel);
+        annotationDetailHeader.append(annotationDetailLabel);*/
         
         this.append(sceneHeader);
         //this.append(splatListContainer);
@@ -223,12 +223,12 @@ class ScenePanel extends Container {
         this.append(new Transform(events));
         this.append(annotationHeader);
         this.append(annotationListContainer);
-        this.append(annotationDetailHeader);
+        /*this.append(annotationDetailHeader);
         this.append(new AnnotationDetail(events, tooltips));
         this.append(new Element({
             class: 'panel-header',
             height: 20
-        }));
+        }));*/
     }
 }
 

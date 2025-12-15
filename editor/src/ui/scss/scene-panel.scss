@@ -8,6 +8,16 @@
     display: none;
 }
 
+#annotation-panel {
+    top: 102px;
+    left: 368px;
+    width: 320px;
+}
+
+.collapsed #annotation-panel {
+    display: none;
+}
+
 .splat-list-container {
     max-height: 300px;
     overflow: auto;

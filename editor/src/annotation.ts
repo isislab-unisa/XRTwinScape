@@ -59,9 +59,16 @@ class AnnotationRule
     filter: number[] = []; // array of emotionalState, skillLevel or expertiseLevel; maybe single value
 }
 
+class Activity
+{
+    activityid: number;
+    objective: string;
+}
+
 class AnnotationData
 {
     annotations: Annotation[] = [];
+    activities: Activity[] = [];
     splat: string;
     camera: AnnotationCamera;
     boundingBox: BoundingBox;

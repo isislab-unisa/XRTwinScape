@@ -23,6 +23,7 @@ import { ViewPanel } from './view-panel';
 import { ViewerExportPopup } from './viewer-export-popup';
 import { version } from '../../package.json';
 import { XR2LearnPublishDialog } from './xr2learn-publish-dialog';
+import { AnnotationPanel } from './annotation-panel';
 
 class EditorUI {
     appContainer: Container;
@@ -113,6 +114,7 @@ class EditorUI {
 
         // bottom toolbar
         const scenePanel = new ScenePanel(events, tooltips);
+        const annotationPanel = new AnnotationPanel(events, tooltips);
         const viewPanel = new ViewPanel(events, tooltips);
         const colorPanel = new ColorPanel(events, tooltips);
         const bottomToolbar = new BottomToolbar(events, tooltips);
@@ -125,6 +127,7 @@ class EditorUI {
         canvasContainer.append(cursorLabel);
         canvasContainer.append(toolsContainer);
         canvasContainer.append(scenePanel);
+        canvasContainer.append(annotationPanel);
         canvasContainer.append(viewPanel);
         canvasContainer.append(colorPanel);
         canvasContainer.append(bottomToolbar);
