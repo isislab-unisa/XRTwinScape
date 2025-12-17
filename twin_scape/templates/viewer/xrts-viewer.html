@@ -763,7 +763,7 @@
                 li.className = 'objective-item active';
                 li.style.color = "#fff";
                 li.style.fontWeight = "bold";
-                li.innerHTML = `<span>All activities completed!</span> <span class="status-icon done">✓</span>`;
+                li.innerHTML = `<span>Lezione Completata!</span> <span class="status-icon done">✓</span>`;
                 list.appendChild(li);
             }
         }
@@ -886,6 +886,11 @@
                         // But assuming user has correct JSON structure now.
                     });
                 }
+            }
+
+            const pcApp = document.querySelector('pc-app');
+            if (pcApp && pcApp.app) {
+                pcApp.app.renderNextFrame = true;
             }
         }
 

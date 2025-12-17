@@ -76055,7 +76055,10 @@ var TRACEID_GPU_TIMINGS = 'GpuTimings';
                     const entity = asset.resource.instantiate();
                     ;
                     app.root.addChild(entity);
-                   
+                    const controlPanel = document.getElementById('controlPanel');
+                    if (controlPanel) {
+                        controlPanel.classList.remove('hidden');
+                    }
                 });
             
                 asset.on('error', (err) => {

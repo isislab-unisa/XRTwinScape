@@ -67,6 +67,7 @@ export class Annotation extends Script {
     static layerMuted = null;
     static materialNormal = null;
     static materialMuted = null;
+    static materialRead = null;
     static mesh = null;
     static _styleSheet = null;
     static instanceCount = 0;
@@ -80,6 +81,7 @@ export class Annotation extends Script {
     camera;
     _tooltip;
     _hotspot;
+    isRead = false;
 
     static attributes = {
         annotationData: { type: 'object' }
@@ -173,6 +175,10 @@ export class Annotation extends Script {
             this.materialMuted.opacity = 0;
             this.materialMuted.update();
         }
+        if (this.materialRead) {
+            this.materialRead.opacity = 0;
+            this.materialRead.update();
+        }
     }
 
     static showAll() {
@@ -184,6 +190,10 @@ export class Annotation extends Script {
         if (this.materialMuted) {
             this.materialMuted.opacity = 0.25;
             this.materialMuted.update();
+        }
+        if (this.materialRead) {
+            this.materialRead.opacity = 1;
+            this.materialRead.update();
         }
     }
 
@@ -221,7 +231,12 @@ export class Annotation extends Script {
             this.materialMuted.destroy();
             this.materialMuted = null;
         }
+		if (this.materialRead) {
+            this.materialRead.destroy();
+            this.materialRead = null;
+        }
 
+        
         this.layerNormal = null;
         this.layerMuted = null;
     }
@@ -275,6 +290,16 @@ export class Annotation extends Script {
 
         this._hotspot.addEventListener('click', (e) => {
             e.stopPropagation();
+
+            if (!this.isRead) {
+                this.isRead = true;
+                if (this.hotspotNormal && this.hotspotNormal.render) {
+                    const readMeshInstance = new MeshInstance(Annotation.mesh, Annotation.materialRead);
+                    this.hotspotNormal.render.meshInstances = [readMeshInstance];
+                    this.app.renderNextFrame = true;
+                }
+            }
+
             if (Annotation._activeTooltip && Annotation._activeTooltip !== this._tooltip) {
                 this._hideTooltip(Annotation._activeTooltip);
             }
@@ -344,6 +369,7 @@ export class Annotation extends Script {
 
             const textureNormal = Annotation.createHotspotTexture(this.app, 0.9);
             const textureMuted = Annotation.createHotspotTexture(this.app, 0.25);
+            const textureRead = Annotation.createHotspotTexture(this.app, 0.9, 64, '#000000', '#8B0000');
 
             // NOTE: depthTest is FALSE for now to ensure visibility over Splats
             Annotation.materialNormal = Annotation._createHotspotMaterial(textureNormal, {
@@ -357,7 +383,13 @@ export class Annotation extends Script {
                 depthTest: false,
                 depthWrite: true
             });
+			Annotation.materialRead = Annotation._createHotspotMaterial(textureRead, {
+                opacity: 1,
+                depthTest: false,
+                depthWrite: true
+            });
 
+            
             Annotation.mesh = Mesh.fromGeometry(this.app.graphicsDevice, new PlaneGeometry());
         }
 
@@ -448,6 +480,7 @@ export class Annotation extends Script {
     }
 
     _updateRotationAndScale() {
+        if (!this.hotspotNormal || !this.hotspotMuted) return;
         const cameraRotation = this.camera.entity.getRotation();
         this._updateHotspotTransform(this.hotspotNormal, cameraRotation);
         this._updateHotspotTransform(this.hotspotMuted, cameraRotation);
@@ -458,6 +491,7 @@ export class Annotation extends Script {
     }
 
     _updateHotspotTransform(hotspot, cameraRotation) {
+        if (!cameraRotation) return;
         hotspot.setRotation(cameraRotation);
         hotspot.rotateLocal(90, 0, 0);
     }
