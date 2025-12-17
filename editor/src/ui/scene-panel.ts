@@ -189,7 +189,6 @@ class ScenePanel extends Container {
 
         annotationHeader.append(annotationIcon);
         annotationHeader.append(annotationLabel);
-        //annotationHeader.append(sceneAnnotationExport);
         annotationHeader.append(sceneAnnotationAdd); // Append the add button after the export button
 
         const annotationList = new AnnotationList(events);
@@ -198,37 +197,24 @@ class ScenePanel extends Container {
             class: 'splat-list-container'
         });
         annotationListContainer.append(annotationList);  
-
-/*        const annotationDetailHeader = new Container({
-            class: 'panel-header'
-        });
-
-        const annotationDetailIcon = new Label({
-            text: '\uE111',
-            class: 'panel-header-icon'
-        });
-
-        const annotationDetailLabel = new Label({
-            text: 'ANNOTATION DETAIL',
-            class: 'panel-header-label'
-        });
-
-        annotationDetailHeader.append(annotationDetailIcon);
-        annotationDetailHeader.append(annotationDetailLabel);*/
-        
         this.append(sceneHeader);
-        //this.append(splatListContainer);
+
         this.append(sceneElementsContainer);
         this.append(transformHeader);
         this.append(new Transform(events));
         this.append(annotationHeader);
         this.append(annotationListContainer);
-        /*this.append(annotationDetailHeader);
-        this.append(new AnnotationDetail(events, tooltips));
-        this.append(new Element({
-            class: 'panel-header',
-            height: 20
-        }));*/
+
+        const updateVisibility = (visible: boolean) => {
+            annotationHeader.hidden = !visible;
+            annotationListContainer.hidden = !visible;
+        };
+
+        events.on('selection.splatChanged', () => updateVisibility(true));
+        events.on('selection.playerCameraChanged', (cam: any) => { if(cam) updateVisibility(false); });
+        events.on('selection.boundingBoxChanged', (box: any) => { if(box) updateVisibility(false); });
+        
+        updateVisibility(true);
     }
 }
 

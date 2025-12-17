@@ -3,6 +3,7 @@ import { Container, Element, Label, NumericInput, TextAreaInput, TextInput } fro
 import { Events } from '../events';
 import { Tooltips } from './tooltips';
 import { AnnotationDetail } from './annotation-detail';
+import { ActivityDetail } from './activity-detail';
 
 class AnnotationPanel extends Container {
 
@@ -38,11 +39,53 @@ class AnnotationPanel extends Container {
         annotationDetailHeader.append(annotationDetailLabel);
         
         this.append(annotationDetailHeader);
-        this.append(new AnnotationDetail(events, tooltips));
-        this.append(new Element({
+        const annotationDetail = new AnnotationDetail(events, tooltips);
+        this.append(annotationDetail);
+
+        const activityDetailHeader = new Container({
+            class: 'panel-header'
+        });
+
+        const activityDetailIcon = new Label({
+            text: '\uE111',
+            class: 'panel-header-icon'
+        });
+
+        const activityDetailLabel = new Label({
+            text: 'ACTIVITY OBJECTIVE',
+            class: 'panel-header-label'
+        });
+
+        activityDetailHeader.append(activityDetailIcon);
+        activityDetailHeader.append(activityDetailLabel);
+
+        this.append(activityDetailHeader);
+        const activityDetail = new ActivityDetail(events, tooltips);
+        this.append(activityDetail);
+        
+        const bottomHeader = new Element({
             class: 'panel-header',
             height: 20
-        }));
+        });
+        this.append(bottomHeader);
+
+        const setVisible = (visible: boolean) => {
+            this.hidden = !visible;
+        };
+
+        events.on('annotationList.selectionChanged', (annotation: any) => {
+            setVisible(!!annotation);
+        });
+
+        events.on('selection.playerCameraChanged', (playerCamera: any) => {
+            if (playerCamera) setVisible(false);
+        });
+
+        events.on('selection.boundingBoxChanged', (boundingBox: any) => {
+            if (boundingBox) setVisible(false);
+        });
+        
+        setVisible(!!events.invoke('annotationSelection'));
     }
 }
 

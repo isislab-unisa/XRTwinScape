@@ -74,4 +74,4 @@ class AnnotationData
     boundingBox: BoundingBox;
 }
 
-export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, AnnotationCamera, BoundingBox, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType}
+export { Annotation, AnnotationContent, AnnotationRule, AnnotationData, AnnotationCamera, BoundingBox, ContentType, EmotionalState, SkillLevel, ExpertiseLevel, FilterOnType, Activity}

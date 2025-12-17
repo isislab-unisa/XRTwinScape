@@ -8,7 +8,7 @@ import { Writer, DownloadWriter, FileStreamWriter } from './serialize/writer';
 import { Splat } from './splat';
 import { serializePly, serializePlyCompressed, SerializeSettings, serializeSplat, serializeViewer, ViewerExportSettings } from './splat-serialize';
 import { localize } from './ui/localization';
-import { Annotation, AnnotationContent, AnnotationData, ContentType, EmotionalState, ExpertiseLevel, FilterOnType, SkillLevel } from './annotation';
+import { Annotation, AnnotationContent, AnnotationData, ContentType, EmotionalState, ExpertiseLevel, FilterOnType, SkillLevel, Activity } from './annotation';
 import "reflect-metadata";
 
 // ts compiler and vscode find this type, but eslint does not
@@ -145,6 +145,15 @@ export async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationDa
         size: new Vec3(raw.boundingBox.size.x, raw.boundingBox.size.y, raw.boundingBox.size.z)
     } : null;
 
+    if (raw.activities) {
+        data.activities = raw.activities.map((act: any) => {
+            const activity = new Activity();
+            activity.activityid = act.activityid;
+            activity.objective = act.objective;
+            return activity;
+        });
+    }
+
     for (const ann of raw.annotations) {
         const annotation = new Annotation(ann.id);
         annotation.position = new Vec3(ann.position.x, ann.position.y, ann.position.z);
@@ -181,6 +190,10 @@ export async function loadAnnotationDataFromJSON(raw: any): Promise<AnnotationDa
 async function saveAnnotationDataToJSON(data: AnnotationData): Promise<any> {
     const raw: any = {
         splat: data.splat,
+        activities: data.activities.map((act) => ({
+            activityid: act.activityid,
+            objective: act.objective
+        })),
         annotations: data.annotations.map((ann) => {
             const obj: any = {
                 id: ann.id,
