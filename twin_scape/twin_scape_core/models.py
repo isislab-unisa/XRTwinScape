@@ -40,7 +40,7 @@ class Status(models.TextChoices):
 class LessonQuerySet(models.QuerySet):
     def delete(self, *args, **kwargs):
         for obj in self:
-            obj.delete()  # chiama il metodo custom delete
+            obj.delete()
         super().delete(*args, **kwargs)
 
 class Lesson(models.Model):
