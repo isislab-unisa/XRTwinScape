@@ -123,9 +123,7 @@ def complete_build(request):
     finally:
         try:
             redis_client.delete("build_lock")
-            print("[LOCK] Lock rilasciato con successo.")
         except Exception as e:
-            print(f"[LOCK] Errore nel rilascio del lock: {e}")
             return JsonResponse({"error": "An error occurred during lock release"}, status=500)
 
 # @login_required

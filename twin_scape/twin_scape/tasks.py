@@ -48,18 +48,24 @@ def call_api_and_save(self, lesson_id, training_type):
 
             url = f"http://full_gaussian_pipe:8090/extract_ply"
             headers = {"Content-type": "application/json"}
-            response = requests.post(url, headers=headers, json=payload)
-            
+            try:
+                response = requests.post(url, headers=headers, json=payload)
+            except Exception as e:
+                lesson.status = Status.FAILED
+                lesson.build_started_at = timezone.now()
+                lesson.save()
+                send_mail(
+                    'Build Fallita',
+                    f"Errore durante la creazione della splat per la lezione: {lesson.title} .",
+                    os.environ.get('EMAIL_HOST_USER'),
+                    [lesson.user.email],
+                    fail_silently=False,
+                )
+                redis_client.delete("build_lock")
+                return f"Lezione {lesson_id} in building"
             print("Response status code:", response.status_code)
             print(response)
             
-            # Simulazione della build
-            # print("Simulazione build in corso...")
-            # time.sleep(30)
-            
-            # response = requests.Response()
-            # response.status_code = 200
-
             if response.status_code == 200:
                 lesson.status = Status.BUILDING
                 lesson.build_started_at = timezone.now()
@@ -71,6 +77,7 @@ def call_api_and_save(self, lesson_id, training_type):
                     [lesson.user.email],
                     fail_silently=False,
                 )
+                redis_client.delete("build_lock")
                 return f"Lezione {lesson_id} in building"
             else:
                 status = Status.FAILED
@@ -84,8 +91,7 @@ def call_api_and_save(self, lesson_id, training_type):
                     fail_silently=False,
                 )
                 if lock.locked():
-                    print("Rilascio il lock...")
-                    lock.release()
+                    redis_client.delete("build_lock")
                 return f"Build failed for lesson {lesson_id}"  
 
         finally:
@@ -147,7 +153,6 @@ def fail_stuck_builds():
         print(f"Errore nell'acquisizione del lock: {e}")
     
     try:
-        if build_lock.locked():
-            build_lock.release()
+        redis_client.delete("build_lock")
     except Exception as e:
         print(f"Errore nell'acquisizione del lock: {e}")

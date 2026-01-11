@@ -3,6 +3,9 @@ from .models import Lesson, Tag
 from unfold.admin import ModelAdmin
 from django.db.models import Q
 from django.utils.safestring import mark_safe
+from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 class TagAdmin(ModelAdmin):
     pass
@@ -30,7 +33,7 @@ class LessonAdmin(ModelAdmin):
         return qs.filter(Q(user=request.user) | Q(status='BUILT'))
 
     def get_fields(self, request, obj=None):
-        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status', 'splat_ply', 'annotation_ply'] # 'user', status 
+        fields = ['title', 'description', 'images', 'video_file', 'lesson_visibility', 'tag', 'user', 'status', 'splat_ply', 'annotation_ply']
         return fields
 
     def get_readonly_fields(self, request, obj=None):
@@ -55,6 +58,42 @@ class LessonAdmin(ModelAdmin):
         if not request.user.is_superuser:
             initial['user'] = request.user.pk
         return initial
+    
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        try:
+            obj = self.get_object(request, object_id)
+            if obj and obj.status in ['BUILT', 'BUILDING', 'RUNNING', 'ENQUEUED']:
+                messages.error(
+                    request, 
+                    f"Cannot modify this lesson because it is in the '{obj.status}' state."
+                )
+                return HttpResponseRedirect(reverse('admin:viewer_lesson_changelist'))
+        except Exception:
+            pass
+        
+        return super().change_view(request, object_id, form_url, extra_context)
+    
+    def delete_view(self, request, object_id, extra_context=None):
+        try:
+            obj = self.get_object(request, object_id)
+            if obj:
+                if obj.status in ['RUNNING', 'BUILDING', 'ENQUEUED']:
+                    messages.error(
+                        request, 
+                        f"Cannot delete this lesson because it is in the '{obj.status}' state."
+                    )
+                    return HttpResponseRedirect(reverse('admin:viewer_lesson_changelist'))
+                
+                if obj.user != request.user and not request.user.is_superuser:
+                    messages.error(
+                        request, 
+                        "You can't delete this lesson because you're not the owner."
+                    )
+                    return HttpResponseRedirect(reverse('admin:viewer_lesson_changelist'))
+        except Exception:
+            pass
+        
+        return super().delete_view(request, object_id, extra_context)
     
     def has_change_permission(self, request, obj=None):
         has_permission = super().has_change_permission(request, obj)

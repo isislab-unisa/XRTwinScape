@@ -15,10 +15,7 @@ app.conf.task_queues = {
     'api_tasks': {
         'exchange': 'api_tasks',
         'routing_key': 'api_tasks',
-    }
-}
-
-app.conf.beat_schedule = {
+    },
     'fail-stuck-builds': {
         'task': 'twin_scape.tasks.fail_stuck_builds',
         'schedule': timedelta(minutes=10),
